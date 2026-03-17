@@ -1,5 +1,8 @@
+var ast;
+var en1;
 
 export default class niveau1 extends Phaser.Scene {
+  
   // constructeur de la classe
   constructor() {
     super({
@@ -15,6 +18,18 @@ export default class niveau1 extends Phaser.Scene {
     this.load.image("t5", "src/assets/tuilesn1/1/5.png");
     this.load.image("t6", "src/assets/tuilesn1/1/6.png");
     this.load.image("plat", "src/assets/tuilesn1/plateform1.png");
+    this.load.spritesheet('space_ast', 'src/assets/space_astroids.png', {
+        frameWidth: 256,
+        frameHeight: 256
+    });
+
+    this.load.image("e1", "src/assets/elemn1/en1.png");
+    this.load.image("e2", "src/assets/elemn1/en2.png");
+    this.load.image("e3", "src/assets/elemn1/en3.png");
+    this.load.image("e4", "src/assets/elemn1/en4.png");
+    this.load.image("e5", "src/assets/elemn1/en5.png");
+    this.load.image("e6", "src/assets/elemn1/en6.png");
+
 
 // chargement de la carte
   this.load.tilemapTiledJSON("carte", "src/assets/planeterouge.json");  
@@ -24,7 +39,7 @@ export default class niveau1 extends Phaser.Scene {
   const carteDuNiveau = this.add.tilemap("carte");
 
 // chargement du jeu de tuiles
-  const ts_bg   = carteDuNiveau.addTilesetImage("1_game_background", "bg");
+    const ts_bg   = carteDuNiveau.addTilesetImage("1_game_background", "bg");
     const ts_t1   = carteDuNiveau.addTilesetImage("1", "t1");
     const ts_t2   = carteDuNiveau.addTilesetImage("2", "t2");
     const ts_t3   = carteDuNiveau.addTilesetImage("3", "t3");
@@ -40,7 +55,7 @@ export default class niveau1 extends Phaser.Scene {
 
     // Collision sur les tuiles solides
     calque_plateformes.setCollisionByProperty({ estSolide: true });
-        calque_plateformes.setCollisionByProperty({ estsolide: true });
+    calque_plateformes.setCollisionByProperty({ estsolide: true });
 
     this.player = this.physics.add.sprite(100, 450, 'astronaut');
     this.player.setSize(50, 70);
@@ -48,12 +63,28 @@ export default class niveau1 extends Phaser.Scene {
     this.player.setCollideWorldBounds(true);
     this.player.direction = 'droite';
 
+    ast = this.physics.add.sprite(2048, 300, 'space_ast');
+
     this.clavier = this.input.keyboard.createCursorKeys();
     this.physics.add.collider(this.player, calque_plateformes);
     this.cameras.main.setBounds(0, 0, 3072, 768); 
     this.cameras.main.startFollow(this.player);
     this.physics.world.setBounds(0, 0, 3072, 768); // ← même dimensions que la caméra
-    
+    // gravité
+    this.toucheGravite = this.input.keyboard.addKey('G');
+
+    //mise en place en1
+     var groupe_en1 = this.physics.add.group(); 
+
+     var en1Images = ["e1", "e2", "e3", "e4", "e5", "e6"]
+    for (let i = 0; i < 6; i++) {
+      var coordX = 300 + 550 * i;
+      var coordY = 0;
+      groupe_en1.create(coordX, coordY, en1Images[i]);
+    };
+    this.physics.add.collider(groupe_en1, calque_plateformes); 
+    this.physics.add.overlap(this.player, groupe_en1, ramasseren1, null, this);
+  this.gravityInverted == false;
   }
 
   update() {
@@ -74,10 +105,29 @@ export default class niveau1 extends Phaser.Scene {
       }
     }
     if (this.clavier.space.isDown && this.player.body.blocked.down) {
-        this.player.setVelocityY(-400);
+        this.player.setVelocityY(-300);
     }
     if (Phaser.Input.Keyboard.JustDown(this.clavier.up)) {
         this.scene.start('pageprincipale');
 }
+ // appuie sur G pour changer la gravité 
+if (Phaser.Input.Keyboard.JustDown(this.toucheGravite)) {
+    if (this.gravityInverted == true) {
+            this.player.body.gravity.y = -600;  // gravité vers le bas
+this.gravityInverted = false;
+//    this.physics.world.gravity.y = -200; // gravité vers le haut
+    this.player.setFlipY(true); // retourne le sprite du joueur
+      } else {
+      this.gravityInverted = true;
+      this.player.body.gravity.y = 0;  // gravité vers le bas
+      this.player.setFlipY(false); // remet le sprite du joueur à l'endroit
+}
   }
+}
+}
+
+//autres fonctions 
+//fonction ramasser element
+function ramasseren1(personnage, element) {
+  element.disableBody(true, true);
 }

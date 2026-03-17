@@ -20,7 +20,7 @@ export default class pageprincipale extends Phaser.Scene {
 
   preload() {
     // fond étoiles 
-    this.load.image("nightskycolor", "src/assets/nightskycolor.png");
+    this.load.image("backgp", "src/assets/backgp.jpg");
 //PLANETES 
     this.load.image('planete1', 'src/assets/planet1.png'); 
     this.load.image('planete2', 'src/assets/planet2.png'); 
@@ -50,7 +50,8 @@ export default class pageprincipale extends Phaser.Scene {
 
   create() {
 // fond 
-    this.cameras.main.setBackgroundColor('#000010');
+    let background = this.add.image(400, 300, 'backgp');
+    background.setScrollFactor(0.4); // le fond ne bouge pas avec la caméra
 
 //planetes
     p1 = this.physics.add.staticSprite(224,  384, 'planete1');
@@ -141,9 +142,16 @@ export default class pageprincipale extends Phaser.Scene {
     this.anims.create({
         key: 'sautdroit',
         frames: this.anims.generateFrameNumbers('astronaut', { start: 30, end: 35 }),
-        frameRate: 10
+        frameRate: 10,
+        repeat: -1
     })
-    
+    this.anims.create({
+        key: 'courir',
+        frames: this.anims.generateFrameNumbers('astronaut', { start: 12, end: 19 }),
+        frameRate: 10,
+        repeat: -1
+    });
+
   }
 
   /***********************************************************************/
@@ -168,13 +176,16 @@ export default class pageprincipale extends Phaser.Scene {
       }
     }
     if (clavier.space.isDown && player.body.blocked.down) {
-        player.setVelocityY(-400);
+        player.setVelocityY(-300);
     }
     if (Phaser.Input.Keyboard.JustDown(boutonentrer)) {
     if (this.physics.overlap(player, p1)) {
         this.scene.start('niveau1');
     }
+     if (Phaser.Input.Keyboard.JustDown(boutoncourir)) {
+        player.anims.play('courir', true);
   }
+}
 }
 }
 /***********************************************************************/
