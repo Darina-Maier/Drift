@@ -5,7 +5,8 @@
 /***********************************************************************/
 var player;
 var clavier;
-
+var p1;
+var boutonentrer;
 
 // définition de la classe "selection"
 export default class pageprincipale extends Phaser.Scene {
@@ -52,7 +53,7 @@ export default class pageprincipale extends Phaser.Scene {
     this.cameras.main.setBackgroundColor('#000010');
 
 //planetes
-    var p1 = this.physics.add.staticSprite(224,  384, 'planete1');
+    p1 = this.physics.add.staticSprite(224,  384, 'planete1');
     var p2 = this.physics.add.staticSprite(470,  384, 'planete2');
     var p3 = this.physics.add.staticSprite(716,  384, 'planete3');
     var p4 = this.physics.add.staticSprite(962,  384, 'planete4');
@@ -90,6 +91,7 @@ export default class pageprincipale extends Phaser.Scene {
 //création joueur 
     player = this.physics.add.sprite(0, 10, 'astronaut'); 
     player.setSize(65, 45); 
+    player.direction='droite'
 
 //parametres joueur 
     player.setCollideWorldBounds(true);
@@ -109,7 +111,11 @@ export default class pageprincipale extends Phaser.Scene {
     this.physics.add.collider(player, p7);
     this.physics.add.collider(player, p8);
     player.setVelocityX(0); // vitesse horizontale constante vers la droite
+    
+    //entrer niveau 
+    boutonentrer = this.input.keyboard.addKey('E');
 
+    //animations
     this.anims.create({
         key: 'anim_droite',
         frames: this.anims.generateFrameNumbers('astronaut', { start: 0, end: 3 }),
@@ -123,9 +129,14 @@ export default class pageprincipale extends Phaser.Scene {
         repeat: -1
     });
     this.anims.create({
-        key: 'immobile',
+        key: 'immobiledroit',
         frames: [ { key: 'astronaut', frame: 21 } ],
-        frameRate: 20
+        frameRate: 1
+    });
+    this.anims.create({
+        key: 'immobilegauche',
+        frames: [ { key: 'astronautinverse', frame: 21 } ],
+        frameRate: 1
     });
     this.anims.create({
         key: 'sautdroit',
@@ -142,18 +153,28 @@ export default class pageprincipale extends Phaser.Scene {
   update() {
     if (clavier.right.isDown) {
       player.setVelocityX(160); 
+      player.direction='droite'
       player.anims.play('anim_droite', true);
     } else if (clavier.left.isDown) {
       player.setVelocityX(-160); 
+      player.direction='gauche'
       player.anims.play('anim_gauche', true);
+    } else{
+       player.setVelocityX(0); // ← action séparée
+    if (player.direction == 'droite') {
+        player.anims.play('immobiledroit', true);
     } else {
-      player.setVelocityX(0); 
-      player.anims.play('immobile', true);
+        player.anims.play('immobilegauche', true);
+      }
     }
     if (clavier.space.isDown && player.body.blocked.down) {
-        player.setVelocityY(-500);
+        player.setVelocityY(-400);
     }
-
+    if (Phaser.Input.Keyboard.JustDown(boutonentrer)) {
+    if (this.physics.overlap(player, p1)) {
+        this.scene.start('niveau1');
+    }
+  }
 }
 }
 /***********************************************************************/
