@@ -1,9 +1,10 @@
 // chargement des librairies
 import pageprincipale from "/src/js/pageprincipale.js";
 import niveau1 from "/src/js/niveau1.js";
-import niveau2 from "/src/js/niveau2.js";
-import niveau3 from "/src/js/niveau3.js";
 import niveau5 from "/src/js/niveau5.js"; 
+import niveau4 from "/src/js/niveau4.js";
+import niveau3 from "/src/js/niveau3.js";
+import niveau2 from
 
 // configuration générale du jeu
 var config = {
@@ -25,9 +26,9 @@ var config = {
       debug: true // permet de voir les hitbox et les vecteurs d'acceleration quand mis à true
     }
   },
-  scene: [niveau5, pageprincipale, niveau1, niveau2, niveau3]
+  scene: [pageprincipale, niveau1, niveau4, niveau3, niveau5]
 };
 
 // création et lancement du jeu
 var game = new Phaser.Game(config);
-game.scene.start("niveau5");
+game.scene.start("niveau3");

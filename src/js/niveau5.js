@@ -4,6 +4,7 @@
 /***********************************************************************/
 var player;
 var clavier;
+var boutoncourir; 
 
 export default class niveau5 extends Phaser.Scene {
   // constructeur de la classe
@@ -60,55 +61,45 @@ export default class niveau5 extends Phaser.Scene {
     this.cameras.main.startFollow(this.player);
     this.physics.world.setBounds(0, 0, 3072, 768); // ← même dimensions que la caméra
 
-    //animations
-    this.anims.create({
-        key: 'anim_droite',
-        frames: this.anims.generateFrameNumbers('astronaut', { start: 0, end: 3 }),
-        frameRate: 10,
-        repeat: -1
-    });
-    this.anims.create({
-        key: 'anim_gauche',
-        frames: this.anims.generateFrameNumbers('astronautinverse', { start: 0, end: 3 }),
-        frameRate: 10,
-        repeat: -1
-    });
-    this.anims.create({
-        key: 'immobiledroit',
-        frames: [ { key: 'astronaut', frame: 21 } ],
-        frameRate: 1
-    });
-    this.anims.create({
-        key: 'immobilegauche',
-        frames: [ { key: 'astronautinverse', frame: 21 } ],
-        frameRate: 1
-    });
-    this.anims.create({
-        key: 'sautdroit',
-        frames: this.anims.generateFrameNumbers('astronaut', { start: 30, end: 35 }),
-        frameRate: 10
-    })
+    boutoncourir = this.input.keyboard.addKey('C');
   }
 
   update() {
-    if (this.clavier.right.isDown) {
-      this.player.setVelocityX(160); 
-      this.player.direction='droite'
-      this.player.anims.play('anim_droite', true);
-    } else if (this.clavier.left.isDown) {
-      this.player.setVelocityX(-160); 
-      this.player.direction='gauche'
-      this.player.anims.play('anim_gauche', true);
-    } else{
-      this.player.setVelocityX(0); // ← action séparée
-    if (this.player.direction == 'droite') {
-        this.player.anims.play('immobiledroit', true);
-    } else {
-        this.player.anims.play('immobilegauche', true);
+    if (boutoncourir.isDown) {
+      if (this.player.direction == 'droite') {
+      //  this.player.setOffset(76, 0);
+
+        this.player.setVelocityX(300); // plus rapide en courant
+        this.player.anims.play('courirdroite', true);
+      } else {
+      //    this.player.setOffset(36, 10);
+        this.player.setVelocityX(-300); // plus rapide en courant
+        this.player.anims.play('courirgauche', true); //gauche plus tard
       }
-    }
-    if (this.clavier.space.isDown && this.player.body.blocked.down) {
-        this.player.setVelocityY(-400);
+    } else {
+      if (this.clavier.right.isDown) {
+        this.player.setVelocityX(160);
+        this.player.direction = 'droite'
+        this.player.anims.play('anim_droite', true);
+        this.player.setOffset(36, 10);
+
+      } else if (this.clavier.left.isDown) {
+        this.player.setVelocityX(-160);
+        this.player.direction = 'gauche'
+        this.player.anims.play('anim_gauche', true);
+        this.player.setOffset(42, 10);
+      } else {
+        this.player.setVelocityX(0); // ← action séparée
+        if (this.player.direction == 'droite') {
+          this.player.anims.play('immobiledroit', true);
+        } else {
+          this.player.anims.play('immobilegauche', true);
+        }
+      }
+
+      if (this.clavier.space.isDown && this.player.body.blocked.down) {
+        this.player.setVelocityY(-300);
+      }
     }
     if (Phaser.Input.Keyboard.JustDown(this.clavier.up)) {
         this.scene.start('pageprincipale');
