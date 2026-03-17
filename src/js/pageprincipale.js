@@ -6,6 +6,13 @@
 var player;
 var clavier;
 var p1;
+var p2;
+var p3;
+var p4;
+var p5;
+var p6;
+var p7;
+var p8;
 var boutonentrer;
 var boutoncourir;
 
@@ -56,12 +63,12 @@ export default class pageprincipale extends Phaser.Scene {
 
         //planetes
         p1 = this.physics.add.staticSprite(224, 384, 'planete1');
-        var p2 = this.physics.add.staticSprite(470, 384, 'planete2');
-        var p3 = this.physics.add.staticSprite(716, 384, 'planete3');
-        var p4 = this.physics.add.staticSprite(962, 384, 'planete4');
-        var p5 = this.physics.add.staticSprite(1208, 384, 'planete5');
-        var p6 = this.physics.add.staticSprite(1454, 384, 'planete6');
-        var p7 = this.physics.add.staticSprite(1700, 384, 'planete7');
+        p2 = this.physics.add.staticSprite(470, 384, 'planete2');
+        p3 = this.physics.add.staticSprite(716, 384, 'planete3');
+        p4 = this.physics.add.staticSprite(962, 384, 'planete4');
+        p5 = this.physics.add.staticSprite(1208, 384, 'planete5');
+        p6 = this.physics.add.staticSprite(1454, 384, 'planete6');
+        p7 = this.physics.add.staticSprite(1700, 384, 'planete7');
         var p8 = this.physics.add.staticSprite(1946, 384, 'planete8');
         var plateforme = this.physics.add.staticSprite(0, 384, 'plateforme1');
 
@@ -199,14 +206,24 @@ export default class pageprincipale extends Phaser.Scene {
             player.setVelocityY(-300);
         }
 
-
+        // permet de entrer dans chaque niveau avec touche E 
         if (Phaser.Input.Keyboard.JustDown(boutonentrer)) {
             if (this.physics.overlap(player, p1)) {
                 this.scene.start('niveau1');
             }
+            if (this.physics.overlap(player, p2)) {
+                this.scene.start('niveau2');
+            }
+            if (this.physics.overlap(player, p3)) {
+                this.scene.start('niveau3');
+            }
+            if (this.physics.overlap(player, p4)) {
+                this.scene.start('niveau4');
+            }
+            if (this.physics.overlap(player, p5)) {
+                this.scene.start('niveau5');
+            }
         }
-
-
     }
 }
 
