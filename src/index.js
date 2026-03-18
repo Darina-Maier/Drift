@@ -28,9 +28,9 @@ var config = {
       debug: true // permet de voir les hitbox et les vecteurs d'acceleration quand mis à true
     }
   },
-  scene: [acceuil, niveau5, pageprincipale, intro, niveau1, niveau2, niveau4, niveau3]
+  scene: [acceuil, niveau1, niveau5, pageprincipale, intro, niveau2, niveau4, niveau3]
 };
 
 // création et lancement du jeu
 var game = new Phaser.Game(config);
-game.scene.start("acceuil");
+game.scene.start("niveau4");
