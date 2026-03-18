@@ -16,8 +16,6 @@ export default class niveau1 extends Phaser.Scene {
     this.load.image("plat2", "src/assets/tuilesn1/platform2.png");
     this.load.image("plat3", "src/assets/tuilesn1/platform3.png");
 
-    this.load.image("door1", "src/assets/door1.png");
-
     this.load.image("e1", "src/assets/elemn1/en1.png");
     this.load.image("e2", "src/assets/elemn1/en2.png");
     this.load.image("e3", "src/assets/elemn1/en3.png");
@@ -25,12 +23,37 @@ export default class niveau1 extends Phaser.Scene {
     this.load.image("e5", "src/assets/elemn1/en5.png");
     this.load.image("e6", "src/assets/elemn1/en6.png");
 
+// chargement de la musique du niveau 1
+    this.load.audio("musiqueNiveau1", "src/assets/sons/niveau1.ogg");
+    // chargement des 9 images du téléporteur
+    this.load.image('tp01', 'src/assets/teleporter/tp01.png');
+    this.load.image('tp02', 'src/assets/teleporter/tp02.png');
+    this.load.image('tp03', 'src/assets/teleporter/tp03.png');
+    this.load.image('tp04', 'src/assets/teleporter/tp04.png');
+    this.load.image('tp05', 'src/assets/teleporter/tp05.png');
+    this.load.image('tp06', 'src/assets/teleporter/tp06.png');
+    this.load.image('tp07', 'src/assets/teleporter/tp07.png');
+    this.load.image('tp08', 'src/assets/teleporter/tp08.png');
+    this.load.image('tp09', 'src/assets/teleporter/tp09.png');
+
 
     // chargement de la carte
     this.load.tilemapTiledJSON("carte", "src/assets/planeterouge.json");
   }
 
   create() {
+// stoppe la musique de l'accueil / intro / page principale
+    if (this.game.musiqueMenu) {
+      this.game.musiqueMenu.stop();
+    }
+
+    // lance la musique du niveau 1
+    this.musiqueNiveau1 = this.sound.add("musiqueNiveau1", {
+      loop: true,
+      volume: 0.5
+    });
+    this.musiqueNiveau1.play();
+
     const carteDuNiveau = this.add.tilemap("carte");
 
     // chargement du jeu de tuiles
@@ -78,23 +101,45 @@ export default class niveau1 extends Phaser.Scene {
     };
     this.physics.add.collider(this.player, calque_plateformes);
     this.physics.add.collider(this.player, calque_death, () => {
-      this.scene.restart(); // redémarre la scène actuelle
+      if (this.musiqueNiveau1) {
+        this.musiqueNiveau1.stop();
+      }
+      this.scene.restart();
     });
+
     this.physics.add.collider(groupe_en1, calque_plateformes);
     this.physics.add.overlap(this.player, groupe_en1, ramasseren1, null, this);
     this.gravityInverted == false;
 
-    // mise en place du portail de sortie
-    this.porte = this.physics.add.sprite(3000, 200, 'door1');
-    this.porte.body.setGravityY(600);
-    this.physics.add.collider(this.porte, calque_plateformes);
-    this.porte.setScale(1.5);
-    this.porte.setVisible(true);
+    // animation du téléporteur avec les 9 images
+this.anims.create({
+  key: 'anim_teleporter',
+  frames: [
+    { key: 'tp01' },
+    { key: 'tp02' },
+    { key: 'tp03' },
+    { key: 'tp04' },
+    { key: 'tp05' },
+    { key: 'tp06' },
+    { key: 'tp07' },
+    { key: 'tp08' },
+    { key: 'tp09' }
+  ],
+  frameRate: 10, // vitesse de rotation
+  repeat: -1     // boucle infinie
+});
 
-    // Quand le joueur touche le trou noir → retour pageprincipale
-    this.physics.add.overlap(this.player, this.porte, () => {
-        this.scene.start('pageprincipale');
-      }, null, this);
+// création tp fin du niveau
+this.teleporter = this.physics.add.sprite(3020, 200, 'tp01');
+this.teleporter.body.allowGravity = false;
+this.teleporter.setImmovable(true);
+
+// animation en boucle 
+this.teleporter.anims.play('anim_teleporter');
+this.teleporter.setScale(0.3);
+this.teleporter.setSize(150,200);
+this.physics.add.overlap(this.player, this.teleporter, this.finNiveau, null, this);
+
   }
 
 
@@ -154,11 +199,24 @@ update() {
     }
   }
 }
+
+finNiveau(player, teleporter) {
+
+  // optionnel : désactiver le joueur pour éviter multi déclenchement
+  player.setVelocity(0);
+  player.disableBody(true, true);
+
+  // retour tp menu principal
+  this.scene.start('pageprincipale');
+}
+
 }
 
 //autres fonctions 
 //fonction ramasser element
 function ramasseren1(personnage, element) {
   element.disableBody(true, true);
+
+
 }
 

@@ -50,6 +50,7 @@ export default class pageprincipale extends Phaser.Scene {
             frameWidth: 130,
             frameHeight: 90
         });
+        this.load.audio('ArriveSurTerre', 'src/assets/sons/accueil.ogg');
     }
 
     /***********************************************************************/
@@ -57,6 +58,17 @@ export default class pageprincipale extends Phaser.Scene {
   /***********************************************************************/
 
     create() {
+        // appliquer l'état global du son
+        this.sound.mute = !this.game.soundOn;
+
+        // relancer la musique menu si elle n'est pas déjà en cours
+        if (!this.game.musiqueMenu || !this.game.musiqueMenu.isPlaying) {
+            this.game.musiqueMenu = this.sound.add('ArriveSurTerre', {
+                loop: true,
+                volume: 0.5
+            });
+            this.game.musiqueMenu.play();
+        }
         // fond 
         let background = this.add.image(400, 300, 'backgp');
         background.setScrollFactor(0.4); // le fond ne bouge pas avec la caméra

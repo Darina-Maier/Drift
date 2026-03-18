@@ -10,10 +10,28 @@ export default class intro extends Phaser.Scene {
             frameWidth: 130,
             frameHeight: 90
         });
-    }
+    this.load.audio("alarme", "src/assets/sons/alarm.ogg");
+}
 
     create() {
         this.cameras.main.setBackgroundColor('#000000');
+        // appliquer l'état global du son
+this.sound.mute = !this.game.soundOn;
+
+// bouton Sound ON / OFF
+this.boutonSon = this.add.text(880, 20, this.game.soundOn ? "Sound ON" : "Sound OFF", {
+    fontSize: "24px",
+    fill: "#ffffff",
+    backgroundColor: "#000000"
+}).setInteractive();
+
+this.boutonSon.setScrollFactor(0);
+
+this.boutonSon.on("pointerdown", () => {
+    this.game.soundOn = !this.game.soundOn;
+    this.sound.mute = !this.game.soundOn;
+    this.boutonSon.setText(this.game.soundOn ? "Sound ON" : "Sound OFF");
+});
 
         // Personnage
         this.perso = this.physics.add.sprite(250, 450, 'astronaut');
@@ -118,12 +136,13 @@ export default class intro extends Phaser.Scene {
         this.tweens.add({
             targets: [this.fusee, this.flammes, this.perso],
             y: '-=700',
-            duration: 2000,
+            duration: 3000,
             ease: 'Power2',
             onComplete: () => {
-                // Flash rouge = explosion
-                this.cameras.main.flash(800, 255, 50, 0);
-                this.etape = 'fin';
+    // Flash rouge = explosion
+    this.cameras.main.flash(800, 255, 50, 0);
+    this.sound.play("alarme");
+    this.etape = 'fin';
 
                 this.time.delayedCall(1500, () => {
                     this.texteEspace.setVisible(false);
@@ -138,6 +157,7 @@ export default class intro extends Phaser.Scene {
                 });
             }
         });
+
     }
 
     update() {

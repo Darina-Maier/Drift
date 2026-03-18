@@ -16,7 +16,7 @@ export default class niveau3 extends Phaser.Scene {
 
 
   preload() {
-
+    this.load.audio("musiqueNiveau3", "src/assets/sons/niveau3.ogg");
     this.load.image("bg", "src/assets/tuilesn3/background_n3.png");
     this.load.image("t1", "src/assets/tuilesn3/Tileset_n3.png");
     
@@ -31,9 +31,21 @@ export default class niveau3 extends Phaser.Scene {
         frameWidth: 130,
         frameHeight: 90
     });
+
+    
   }
 
   create() {
+     // stoppe les anciennes musiques
+  this.sound.stopAll();
+
+  // lance la musique du niveau 3
+  this.musiqueNiveau3 = this.sound.add("musiqueNiveau3", {
+    loop: true,
+    volume: 0.5
+});
+
+this.musiqueNiveau3.play();
     
     const carten3 = this.add.tilemap( "carte" );
 
@@ -105,6 +117,9 @@ export default class niveau3 extends Phaser.Scene {
         this.player.setVelocityY(-300);
       }
     if (Phaser.Input.Keyboard.JustDown(this.clavier.up)) {
+    if (this.musiqueNiveau3) {
+        this.musiqueNiveau3.stop();
+    }
         this.scene.start('pageprincipale');
 }
 // appuie sur G pour changer la gravité 
