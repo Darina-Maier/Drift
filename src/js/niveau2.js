@@ -24,7 +24,7 @@ export default class niveau2 extends Phaser.Scene {
     this.load.image("tuilesJeu", "src/assets/tuilesn2/tuilesJeu.png");
     this.load.image("platform1", "src/assets/tuilesn2/DungeonTileSet.png");
     this.load.image("platform2", "src/assets/tuilesn1/platform3.png");
-
+    this.load.audio("musiqueNiveau2", "src/assets/sons/niveau2.ogg");
     this.load.tilemapTiledJSON("carte2", "src/assets/niveau2.json");
 
     this.load.spritesheet('astronaut', 'src/assets/astronaut.png', {
@@ -46,6 +46,17 @@ export default class niveau2 extends Phaser.Scene {
   }
 
   create() {
+    // stoppe les anciennes musiques
+    this.sound.stopAll();
+
+    // musique niveau 2
+    this.musiqueNiveau2 = this.sound.add("musiqueNiveau2", {
+      loop: true,
+      volume: 0.5
+    });
+    this.musiqueNiveau2.play();
+
+
     const carteDuNiveau2 = this.add.tilemap("carte2");
 
     const ts_bg2 = carteDuNiveau2.addTilesetImage("background_niveau2", "bg2");
@@ -218,7 +229,10 @@ export default class niveau2 extends Phaser.Scene {
 
     }
     if (Phaser.Input.Keyboard.JustDown(this.clavier.up)) {
-      this.scene.start('pageprincipale');
+        if (this.musiqueNiveau2) {
+          this.musiqueNiveau2.stop();
+        }
+        this.scene.start('pageprincipale');
     }
 
 

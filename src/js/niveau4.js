@@ -11,6 +11,7 @@ export default class niveau4 extends Phaser.Scene {
   }
 
   preload() {
+    this.load.audio("musiqueNiveau4", "src/assets/sons/niveau4.ogg");
     // Images des tilesets
     this.load.image("bg4", "src/assets/tuilesn4/background_n4.png");
     this.load.image("t4", "src/assets/tuilesn4/Tileset_n4.png");
@@ -43,7 +44,17 @@ export default class niveau4 extends Phaser.Scene {
   }
 
   create() {
-    
+    // stoppe les anciennes musiques
+  this.sound.stopAll();
+
+  // lance la musique du niveau 4
+  this.musiqueNiveau4 = this.sound.add("musiqueNiveau4", {
+    loop: true,
+    volume: 0.5
+});
+
+this.musiqueNiveau4.play();
+ 
     // CARTE ET LAYERS
     
     const carten4 = this.add.tilemap("carte4");
@@ -191,11 +202,13 @@ this.physics.add.overlap(this.player, this.teleporter, this.finNiveau, null, thi
     // /CHANGEMENT DE SCÈNE
     
     if (Phaser.Input.Keyboard.JustDown(this.clavier.up)) {
-      this.scene.start("pageprincipale");
+    if (this.musiqueNiveau4) {
+        this.musiqueNiveau4.stop();
     }
+    this.scene.start('pageprincipale');
 
-    
-    // INVERSION DE GRAVITÉ
+}
+   // INVERSION DE GRAVITÉ
     
     if (Phaser.Input.Keyboard.JustDown(this.toucheGravite)) {
       if (this.gravityInverted) {
