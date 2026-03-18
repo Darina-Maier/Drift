@@ -25,12 +25,25 @@ export default class niveau1 extends Phaser.Scene {
     this.load.image("e5", "src/assets/elemn1/en5.png");
     this.load.image("e6", "src/assets/elemn1/en6.png");
 
-
+// chargement de la musique du niveau 1
+    this.load.audio("musiqueNiveau1", "src/assets/sons/niveau1.ogg");
     // chargement de la carte
     this.load.tilemapTiledJSON("carte", "src/assets/planeterouge.json");
   }
 
   create() {
+// stoppe la musique de l'accueil / intro / page principale
+    if (this.game.musiqueMenu) {
+      this.game.musiqueMenu.stop();
+    }
+
+    // lance la musique du niveau 1
+    this.musiqueNiveau1 = this.sound.add("musiqueNiveau1", {
+      loop: true,
+      volume: 0.5
+    });
+    this.musiqueNiveau1.play();
+
     const carteDuNiveau = this.add.tilemap("carte");
 
     // chargement du jeu de tuiles
@@ -78,8 +91,12 @@ export default class niveau1 extends Phaser.Scene {
     };
     this.physics.add.collider(this.player, calque_plateformes);
     this.physics.add.collider(this.player, calque_death, () => {
-      this.scene.restart(); // redémarre la scène actuelle
+      if (this.musiqueNiveau1) {
+        this.musiqueNiveau1.stop();
+      }
+      this.scene.restart();
     });
+
     this.physics.add.collider(groupe_en1, calque_plateformes);
     this.physics.add.overlap(this.player, groupe_en1, ramasseren1, null, this);
     this.gravityInverted == false;

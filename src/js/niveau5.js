@@ -20,7 +20,7 @@ export default class niveau5 extends Phaser.Scene {
 
 
   preload() {
-
+    this.load.audio("musiqueNiveau5", "src/assets/sons/niveau5.ogg");
     this.load.image("bg5", "src/assets/tuilesn5/background_n5.png");
     this.load.image("t5", "src/assets/tuilesn5/Tileset_n5.png");
 
@@ -60,7 +60,16 @@ this.load.image('tp09', 'src/assets/teleporter/tp09.png');
   }
 
   create() {
+    // stoppe les anciennes musiques
+  this.sound.stopAll();
 
+  // lance la musique du niveau 5
+  this.musiqueNiveau5 = this.sound.add("musiqueNiveau5", {
+    loop: true,
+    volume: 0.5
+});
+
+this.musiqueNiveau5.play();
     const carten5 = this.add.tilemap("carte5");
 
     // chargement du jeu de tuiles
