@@ -75,7 +75,7 @@ this.load.image('tp09', 'src/assets/teleporter/tp09.png');
     calque_plateformes5.setCollisionByProperty({ estSolide: true });
     calque_plateformes5.setCollisionByProperty({ estsolide: true });
 
-    this.player = this.physics.add.sprite(270, 10, 'astronaut');
+    this.player = this.physics.add.sprite(270, 0, 'astronaut');
     this.player.setSize(50, 70);
     this.player.setOffset(36, 10);
     this.player.setCollideWorldBounds(true);

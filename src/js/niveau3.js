@@ -31,6 +31,8 @@ export default class niveau3 extends Phaser.Scene {
         frameWidth: 130,
         frameHeight: 90
     });
+
+    
   }
 
   create() {
