@@ -67,7 +67,7 @@ export default class niveau4 extends Phaser.Scene {
     
     // JOUEUR
     
-    this.player = this.physics.add.sprite(2900, 450, "astronaut");
+    this.player = this.physics.add.sprite(100, 450, "astronaut");
 
     this.player.setSize(50, 70);
     this.player.setOffset(36, 10);

@@ -28,7 +28,7 @@ var config = {
       debug: true // permet de voir les hitbox et les vecteurs d'acceleration quand mis à true
     }
   },
-  scene: [acceuil, niveau1, niveau5, pageprincipale, intro, niveau2, niveau4, niveau3]
+  scene: [acceuil, intro,pageprincipale, niveau1, niveau2, niveau3, niveau4, niveau5]
 };
 
 // création et lancement du jeu
