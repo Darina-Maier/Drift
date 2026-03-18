@@ -17,6 +17,7 @@ export default class niveau6 extends Phaser.Scene {
 
 
   preload() {
+    this.load.audio("musiqueNiveau6", "src/assets/sons/niveau6.ogg");
 
     this.load.image("bg6", "src/assets/tuilesn6/2_game_background.png");
     this.load.image("t6", "src/assets/tuilesn6/alien-planet-tileset.png");
@@ -35,6 +36,15 @@ export default class niveau6 extends Phaser.Scene {
   }
 
   create() {
+   // stoppe les anciennes musiques
+    this.sound.stopAll();
+
+    // musique niveau 2
+    this.musiqueNiveau6 = this.sound.add("musiqueNiveau6", {
+      loop: true,
+      volume: 0.5
+    });
+    this.musiqueNiveau6.play();
     
     const carten6 = this.add.tilemap( "carte6" );
 
@@ -114,8 +124,14 @@ export default class niveau6 extends Phaser.Scene {
     if (this.clavier.space.isDown && this.player.body.blocked.down) {
         this.player.setVelocityY(-400);
     }
+    // /CHANGEMENT DE SCÈNE
+    
     if (Phaser.Input.Keyboard.JustDown(this.clavier.up)) {
-        this.scene.start('pageprincipale');
+    if (this.musiqueNiveau4) {
+        this.musiqueNiveau4.stop();
+    }
+    this.scene.start('pageprincipale');
+
 }
 // appuie sur G pour changer la gravité 
 if (Phaser.Input.Keyboard.JustDown(this.toucheGravite)) {

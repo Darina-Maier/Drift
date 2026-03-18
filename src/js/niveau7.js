@@ -17,6 +17,7 @@ export default class niveau7 extends Phaser.Scene {
 
 
   preload() {
+    this.load.audio("musiqueNiveau7", "src/assets/sons/niveau7.ogg");
 
     this.load.image("bg7", "src/assets/tuilesn7/background_n7.png");
     this.load.image("t7", "src/assets/tuilesn7/Tileset_n7.png");
@@ -35,6 +36,15 @@ export default class niveau7 extends Phaser.Scene {
   }
 
   create() {
+     // stoppe les anciennes musiques
+    this.sound.stopAll();
+
+    // musique niveau 2
+    this.musiqueNiveau7 = this.sound.add("musiqueNiveau7", {
+      loop: true,
+      volume: 0.5
+    });
+    this.musiqueNiveau7.play();
     
     const carten7 = this.add.tilemap( "carte7" );
 
@@ -115,7 +125,11 @@ export default class niveau7 extends Phaser.Scene {
         this.player.setVelocityY(-400);
     }
     if (Phaser.Input.Keyboard.JustDown(this.clavier.up)) {
-        this.scene.start('pageprincipale');
+    if (this.musiqueNiveau4) {
+        this.musiqueNiveau4.stop();
+    }
+    this.scene.start('pageprincipale');
+
 }
 // appuie sur G pour changer la gravité 
 if (Phaser.Input.Keyboard.JustDown(this.toucheGravite)) {
