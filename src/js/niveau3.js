@@ -60,8 +60,11 @@ export default class niveau3 extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, 3072, 768); 
     this.cameras.main.startFollow(this.player);
     this.physics.world.setBounds(0, 0, 3072, 768); // ← même dimensions que la caméra
-
+    
+    //touches definies
     this.toucheGravite = this.input.keyboard.addKey('G');
+    this.graviteDirection = 'bas'; // démarre vers le bas
+    this.physics.world.gravity.set(0, 300); 
     boutoncourir = this.input.keyboard.addKey('C');
   }
 
@@ -106,19 +109,26 @@ export default class niveau3 extends Phaser.Scene {
 }
 // appuie sur G pour changer la gravité 
 if (Phaser.Input.Keyboard.JustDown(this.toucheGravite)) {
-    if (this.gravityInverted == true) {
-            this.player.body.gravity.y = -600;  // gravité vers le bas
-this.gravityInverted = false;
-//    this.physics.world.gravity.y = -200; // gravité vers le haut
-    this.player.setFlipY(true); // retourne le sprite du joueur
-      } else {
-      this.gravityInverted = true;
-      this.player.body.gravity.y = 0;  // gravité vers le bas
-      this.player.setFlipY(false); // remet le sprite du joueur à l'endroit
-
+    if (this.graviteDirection == 'bas') {
+        this.graviteDirection = 'gauche';
+        this.physics.world.gravity.set(-300, 0);
+        this.player.setAngle(-90); // tourne le sprite
+    } else if (this.graviteDirection == 'gauche') {
+        this.graviteDirection = 'haut';
+        this.physics.world.gravity.set(0, -300);
+        this.player.setAngle(180);
+    } else if (this.graviteDirection == 'haut') {
+        this.graviteDirection = 'droite';
+        this.physics.world.gravity.set(300, 0);
+        this.player.setAngle(90);
+    } else if (this.graviteDirection == 'droite') {
+        this.graviteDirection = 'bas';
+        this.physics.world.gravity.set(0, 300);
+        this.player.setAngle(0);
     }
+}
   }
 }
-}
+
 
 

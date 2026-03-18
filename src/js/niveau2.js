@@ -162,41 +162,24 @@ console.log("calque_background:", calque_background);
 
   updateTimer() {
     timeRemaining--;
-    
+
     const minutes = Math.floor(timeRemaining / 60);
     const seconds = timeRemaining % 60;
     const displaySeconds = seconds < 10 ? '0' + seconds : seconds;
-    
     timerText.setText('Temps: ' + minutes + ':' + displaySeconds);
-    
-    // Changer la couleur en rouge quand il reste 15 secondes
+
+    // Rouge quand il reste 15 secondes
     if (timeRemaining <= 15) {
-      timerText.setFill('#ff0000');
+        timerText.setFill('#ff0000');
     }
-    
-    // Arrêter le timer à 0 et afficher Game Over
+
+    // Timer écoulé → reset position + repart de 90 secondes
     if (timeRemaining <= 0) {
-      this.time.removeAllEvents();
-      timerText.setText('Temps: 0:00');
-      
-      // Afficher Game Over
-      this.add.text(
-        this.cameras.main.centerX,
-        this.cameras.main.centerY,
-        'GAME OVER!',
-        {
-          fontSize: '64px',
-          fill: '#ff0000',
-          fontStyle: 'bold',
-          align: 'center'
-        }
-      ).setOrigin(0.5, 0.5).setScrollFactor(0);
-      
-      // Bloquer le joueur
-      this.player.setVelocity(0, 0);
-      this.player.setCollideWorldBounds(true);
-      this.player.body.setImmovable(true);
+        this.player.setPosition(100, 450);
+        this.player.setVelocity(0, 0);
+        timeRemaining = 90;
+        timerText.setFill('#ffffff');
     }
-  }
+}
 }
 

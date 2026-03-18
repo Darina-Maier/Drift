@@ -1,6 +1,6 @@
 var ast;
 var en1;
-var boutoncourir; 
+var boutoncourir;
 
 export default class niveau1 extends Phaser.Scene {
 
@@ -12,11 +12,11 @@ export default class niveau1 extends Phaser.Scene {
   }
   preload() {
     this.load.image("bg", "src/assets/tuilesn1/1/1_game_background.png");
-    this.load.image("plat", "src/assets/tuilesn1/plateform1.png");
-    this.load.spritesheet('space_ast', 'src/assets/space_astroids.png', {
-      frameWidth: 256,
-      frameHeight: 256
-    });
+    this.load.image("plat1", "src/assets/tuilesn1/plateform1.png");
+    this.load.image("plat2", "src/assets/tuilesn1/platform2.png");
+    this.load.image("plat3", "src/assets/tuilesn1/platform3.png");
+
+    this.load.image("door1", "src/assets/door1.png");
 
     this.load.image("e1", "src/assets/elemn1/en1.png");
     this.load.image("e2", "src/assets/elemn1/en2.png");
@@ -35,14 +35,16 @@ export default class niveau1 extends Phaser.Scene {
 
     // chargement du jeu de tuiles
     const ts_bg = carteDuNiveau.addTilesetImage("1_game_background", "bg");
-    
-    const ts_plat = carteDuNiveau.addTilesetImage("plateform1", "plat");
 
-    const tilesets = [ts_bg, ts_plat];
+    const ts_plat1 = carteDuNiveau.addTilesetImage("plateform1", "plat1");
+    const ts_plat2 = carteDuNiveau.addTilesetImage("platform2", "plat2");
+    const ts_plat3 = carteDuNiveau.addTilesetImage("platform3", "plat3");
 
-    const calque_background  = carteDuNiveau.createLayer("calque_planète_rouge", tilesets);
-    const calque_plateformes = carteDuNiveau.createLayer("calque_platform",      tilesets);
-    const calque_death       = carteDuNiveau.createLayer("calque_platform_death", tilesets);
+    const tilesets = [ts_bg, ts_plat1, ts_plat2, ts_plat3];
+
+    const calque_background = carteDuNiveau.createLayer("calque_planète_rouge", tilesets);
+    const calque_plateformes = carteDuNiveau.createLayer("calque_platform", tilesets);
+    const calque_death = carteDuNiveau.createLayer("calque_platform_death", tilesets);
 
 
     // Collision sur les plateformes
@@ -55,8 +57,6 @@ export default class niveau1 extends Phaser.Scene {
     this.player.setOffset(36, 10);
     this.player.setCollideWorldBounds(true);
     this.player.direction = 'droite';
-
-    ast = this.physics.add.sprite(2048, 300, 'space_ast');
 
     this.clavier = this.input.keyboard.createCursorKeys();
     this.cameras.main.setBounds(0, 0, 3072, 768);
@@ -83,64 +83,77 @@ export default class niveau1 extends Phaser.Scene {
     this.physics.add.collider(groupe_en1, calque_plateformes);
     this.physics.add.overlap(this.player, groupe_en1, ramasseren1, null, this);
     this.gravityInverted == false;
+
+    // mise en place du portail de sortie
+    this.porte = this.physics.add.sprite(3000, 200, 'door1');
+    this.porte.body.setGravityY(600);
+    this.physics.add.collider(this.porte, calque_plateformes);
+    this.porte.setScale(1.5);
+    this.porte.setVisible(true);
+
+    // Quand le joueur touche le trou noir → retour pageprincipale
+    this.physics.add.overlap(this.player, this.porte, () => {
+        this.scene.start('pageprincipale');
+      }, null, this);
   }
 
-  update() {
-    if (boutoncourir.isDown) {
-      if (this.player.direction == 'droite') {
+
+update() {
+  if (boutoncourir.isDown) {
+    if (this.player.direction == 'droite') {
       //  this.player.setOffset(76, 0);
 
-        this.player.setVelocityX(300); // plus rapide en courant
-        this.player.anims.play('courirdroite', true);
-      } else {
-      //    this.player.setOffset(36, 10);
-        this.player.setVelocityX(-300); // plus rapide en courant
-        this.player.anims.play('courirgauche', true); //gauche plus tard
-      }
+      this.player.setVelocityX(300); // plus rapide en courant
+      this.player.anims.play('courirdroite', true);
     } else {
-      if (this.clavier.right.isDown) {
-        this.player.setVelocityX(160);
-        this.player.direction = 'droite'
-        this.player.anims.play('anim_droite', true);
-        this.player.setOffset(36, 10);
+      //    this.player.setOffset(36, 10);
+      this.player.setVelocityX(-300); // plus rapide en courant
+      this.player.anims.play('courirgauche', true); //gauche plus tard
+    }
+  } else {
+    if (this.clavier.right.isDown) {
+      this.player.setVelocityX(160);
+      this.player.direction = 'droite'
+      this.player.anims.play('anim_droite', true);
+      this.player.setOffset(36, 10);
 
-      } else if (this.clavier.left.isDown) {
-        this.player.setVelocityX(-160);
-        this.player.direction = 'gauche'
-        this.player.anims.play('anim_gauche', true);
-        this.player.setOffset(42, 10);
+    } else if (this.clavier.left.isDown) {
+      this.player.setVelocityX(-160);
+      this.player.direction = 'gauche'
+      this.player.anims.play('anim_gauche', true);
+      this.player.setOffset(42, 10);
+    } else {
+      this.player.setVelocityX(0); // ← action séparée
+      if (this.player.direction == 'droite') {
+        this.player.anims.play('immobiledroit', true);
       } else {
-        this.player.setVelocityX(0); // ← action séparée
-        if (this.player.direction == 'droite') {
-          this.player.anims.play('immobiledroit', true);
-        } else {
-          this.player.anims.play('immobilegauche', true);
-        }
+        this.player.anims.play('immobilegauche', true);
       }
+    }
 
-      if (this.clavier.space.isDown && this.player.body.blocked.down) {
-        this.player.setVelocityY(-300);
-      }
+    if (this.clavier.space.isDown && this.player.body.blocked.down) {
+      this.player.setVelocityY(-300);
+    }
 
-      if (Phaser.Input.Keyboard.JustDown(this.clavier.up)) {
-        this.scene.start('pageprincipale');
-      }
+    if (Phaser.Input.Keyboard.JustDown(this.clavier.up)) {
+      this.scene.start('pageprincipale');
+    }
 
-      // appuie sur G pour changer la gravité 
-      if (Phaser.Input.Keyboard.JustDown(this.toucheGravite)) {
-        if (this.gravityInverted == true) {
-          this.player.body.gravity.y = -600;  // gravité vers le bas
-          this.gravityInverted = false;
-          //    this.physics.world.gravity.y = -200; // gravité vers le haut
-          this.player.setFlipY(true); // retourne le sprite du joueur
-        } else {
-          this.gravityInverted = true;
-          this.player.body.gravity.y = 0;  // gravité vers le bas
-          this.player.setFlipY(false); // remet le sprite du joueur à l'endroit
-        }
+    // appuie sur G pour changer la gravité 
+    if (Phaser.Input.Keyboard.JustDown(this.toucheGravite)) {
+      if (this.gravityInverted == true) {
+        this.player.body.gravity.y = -600;  // gravité vers le bas
+        this.gravityInverted = false;
+        //    this.physics.world.gravity.y = -200; // gravité vers le haut
+        this.player.setFlipY(true); // retourne le sprite du joueur
+      } else {
+        this.gravityInverted = true;
+        this.player.body.gravity.y = 0;  // gravité vers le bas
+        this.player.setFlipY(false); // remet le sprite du joueur à l'endroit
       }
     }
   }
+}
 }
 
 //autres fonctions 
