@@ -35,8 +35,4 @@ var config = {
 
 // création et lancement du jeu
 var game = new Phaser.Game(config);
-<<<<<<< HEAD
 game.scene.start("acceuil"); // démarre la scène pageprincipale
-=======
-game.scene.start("niveau7"); // démarre la scène pageprincipale
->>>>>>> 648e5676a9067faa75148732708864df5f12742b
