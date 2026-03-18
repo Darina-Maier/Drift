@@ -7,6 +7,8 @@ import niveau3 from "/src/js/niveau3.js";
 import niveau2 from "/src/js/niveau2.js";
 import intro from "/src/js/intro.js";
 import acceuil from "/src/js/acceuil.js";
+import niveau6 from "/src/js/niveau6.js";
+import niveau7 from "/src/js/niveau7.js";
 
 // configuration générale du jeu
 var config = {
@@ -28,7 +30,7 @@ var config = {
       debug: true // permet de voir les hitbox et les vecteurs d'acceleration quand mis à true
     }
   },
-  scene: [acceuil, intro,pageprincipale, niveau1, niveau2, niveau3, niveau4, niveau5]
+  scene: [acceuil, intro,pageprincipale, niveau1, niveau2, niveau3, niveau4, niveau5, niveau6, niveau7]
 };
 
 // création et lancement du jeu
