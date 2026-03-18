@@ -97,6 +97,17 @@ export default class pageprincipale extends Phaser.Scene {
         p8.body.setCircle(94); // définit une hitbox circulaire de rayon 128 pixels centrée sur le sprite
         p8.body.setOffset(56, 56);
 
+        // ajout des noms des planètes 
+        this.add.text(185, 500, 'MAKHCHAN', { fontSize: '16px', fill: '#fff' });
+        this.add.text(441, 500, 'FRAGALE', { fontSize: '16px', fill: '#fff' });
+        this.add.text(687, 500, 'DURAND', { fontSize: '16px', fill: '#fff' });
+        this.add.text(933, 500, 'JOUSSET', { fontSize: '16px', fill: '#fff' });
+        this.add.text(1182, 500, 'MEYER', { fontSize: '16px', fill: '#fff' });
+        this.add.text(1430, 500, 'ALONZO', { fontSize: '16px', fill: '#fff' });
+        this.add.text(1671, 500, 'DARTIES', { fontSize: '16px', fill: '#fff' });
+        this.add.text(1920, 500, 'TERRE', { fontSize: '16px', fill: '#fff' });
+
+
         //création joueur 
         player = this.physics.add.sprite(0, 10, 'astronaut');
         player.setSize(65, 45);
