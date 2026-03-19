@@ -21,6 +21,17 @@ export default class acceuil extends Phaser.Scene {
         // Fond du menu
         this.add.image(512, 384, "background");
 
+        // ── ÉTOILES EN ARRIÈRE PLAN ───────────────────────────────
+        for (let i = 0; i < 400; i++) {
+            this.add.circle(
+                Phaser.Math.Between(0, 1024),
+                Phaser.Math.Between(0, 768),
+                Phaser.Math.Between(1, 2),
+                0xffffff,
+                Phaser.Math.FloatBetween(0.3, 1)
+            );
+        }
+
         // Bouton sound on/off en haut à droite
         this.boutonSon = this.add.text(880, 20, this.game.soundOn ? "Sound ON" : "Sound OFF", {
             fontSize: "24px",
@@ -52,7 +63,15 @@ export default class acceuil extends Phaser.Scene {
         // Clic → lance la scène Selection
         bouton_play.on("pointerup", () => {
             this.scene.start("intro");
+<<<<<<< HEAD
         });
+=======
+        }); if (!this.game.musiqueMenu) {
+            this.game.musiqueMenu = this.sound.add('ArriveSurTerre', {
+                loop: true,
+                volume: 0.5
+            });
+>>>>>>> 864416b85afe122d7ca1f3a7370d47ff893e8662
 
         // Relancer la musique menu si elle n'est pas en cours
         if (!this.game.musiqueMenu || !this.game.musiqueMenu.isPlaying) {
