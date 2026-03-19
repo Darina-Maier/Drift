@@ -21,6 +21,17 @@ export default class acceuil extends Phaser.Scene {
         // Fond du menu
         this.add.image(512, 384, "background");
 
+         // ── ÉTOILES ───────────────────────────────────────────────
+        for (let i = 0; i < 450; i++) {
+            this.add.circle(
+                Phaser.Math.Between(0, 1024),
+                Phaser.Math.Between(0, 768),
+                Phaser.Math.Between(1, 2),
+                0xffffff,
+                Phaser.Math.FloatBetween(0.3, 1)
+            );
+        }
+
         // Bouton sound on/off en haut à droite
         this.boutonSon = this.add.text(880, 20, this.game.soundOn ? "Sound ON" : "Sound OFF", {
             fontSize: "24px",
