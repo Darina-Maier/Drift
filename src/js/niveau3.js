@@ -74,7 +74,7 @@ export default class niveau3 extends Phaser.Scene {
     calque_plateformes.setCollisionByProperty({ estsolide: true });
 
     // création du joueur
-    this.player = this.physics.add.sprite(2950, 200, 'astronaut');
+    this.player = this.physics.add.sprite(220, 200, 'astronaut');
     this.player.setSize(50, 70);
     this.player.setOffset(36, 10);
     this.player.setCollideWorldBounds(true);

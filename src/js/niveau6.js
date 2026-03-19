@@ -6,23 +6,23 @@ var clavier;
 var boutonFeu;
 var groupeBullets;
 
-export default class niveau5 extends Phaser.Scene {
+export default class niveau6 extends Phaser.Scene {
   // constructeur de la classe
   constructor() {
     super({
-      key: "niveau5" // ici on précise le nom de la classe en tant qu'identifiant
+      key: "niveau6" // ici on précise le nom de la classe en tant qu'identifiant
     });
   }
 
   preload() {
-    this.load.audio("musiqueNiveau5", "src/assets/sons/niveau5.ogg");
-    this.load.image("bg5", "src/assets/tuilesn5/background_n5.png");
-    this.load.image("t5", "src/assets/tuilesn5/Tileset_n5.png");
-    // chargement piece5
-    this.load.image('piece5', 'src/assets/tuilesn5/piece5.png');
+    this.load.audio("musiqueNiveau6", "src/assets/sons/niveau6.ogg");
+    this.load.image("bg6", "src/assets/tuilesn6/2_game_background.png");
+    this.load.image("t6", "src/assets/tuilesn6/alien-planet-tileset.png");
+    // chargement piece6
+    this.load.image('piece6', 'src/assets/piece.png');
 
     // chargement de la carte
-    this.load.tilemapTiledJSON("carte5", "src/assets/map_n5.json");
+    this.load.tilemapTiledJSON("carte6", "src/assets/map_n6.json");
 
     this.load.spritesheet('astronaut', 'src/assets/astronaut.png', {
       frameWidth: 130,
@@ -34,12 +34,12 @@ export default class niveau5 extends Phaser.Scene {
     });
 
     // chargement meteorite
-    this.load.spritesheet('meteorites', 'src/assets/tuilesn5/meteorite.png', {
+    this.load.spritesheet('meteorites', 'src/assets/tuilesn6/meteorite.png', {
       frameWidth: 250,
       frameHeight: 250
     });
     // chargement tir
-    this.load.image("bullet", "src/assets/tuilesn5/balle.png");
+    this.load.image("bullet", "src/assets/tuilesn6/balle.png");
 
     // chargement des 9 images du téléporteur
     this.load.image('tp01', 'src/assets/teleporter/tp01.png');
@@ -57,35 +57,35 @@ export default class niveau5 extends Phaser.Scene {
     // stoppe les anciennes musiques
     this.sound.stopAll();
 
-    // lance la musique du niveau 5
-    this.musiqueNiveau5 = this.sound.add("musiqueNiveau5", {
+    // lance la musique du niveau 6
+    this.musiqueNiveau6 = this.sound.add("musiqueNiveau6", {
       loop: true,
       volume: 0.5
     });
-    this.musiqueNiveau5.play();
+    this.musiqueNiveau6.play();
 
-    const carten5 = this.add.tilemap("carte5");
+    const carten6 = this.add.tilemap("carte6");
 
     // chargement du jeu de tuiles
-    const ts_bg5 = carten5.addTilesetImage("background_n5", "bg5");
-    const ts_t5 = carten5.addTilesetImage("plateforme_n5", "t5");
-    const tilesets = [ts_bg5, ts_t5];
+    const ts_bg6 = carten6.addTilesetImage("niveau6", "bg6");
+    const ts_t6 = carten6.addTilesetImage("alien-planet-tileset", "t6");
+    const tilesets = [ts_bg6, ts_t6];
 
-    const calque_background5 = carten5.createLayer("calque_background_n5", tilesets);
-    const calque_plateformes5 = carten5.createLayer("calque_plateformes_n5", tilesets);
+    const calque_background6 = carten6.createLayer("calque_background_niveau6", tilesets);
+    const calque_plateformes6 = carten6.createLayer("calque_platform_n6", tilesets);
 
     // Collision sur les tuiles solides
-    calque_plateformes5.setCollisionByProperty({ estSolide: true });
-    calque_plateformes5.setCollisionByProperty({ estsolide: true });
+    calque_plateformes6.setCollisionByProperty({ estSolide: true });
+    calque_plateformes6.setCollisionByProperty({ estsolide: true });
 
-    this.player = this.physics.add.sprite(2950, 0, 'astronaut');
+    this.player = this.physics.add.sprite(100, 0, 'astronaut');
     this.player.setSize(50, 70);
     this.player.setOffset(36, 10);
     this.player.setCollideWorldBounds(true);
     this.player.direction = 'droite';
 
     this.clavier = this.input.keyboard.createCursorKeys();
-    this.physics.add.collider(this.player, calque_plateformes5);
+    this.physics.add.collider(this.player, calque_plateformes6);
     this.cameras.main.setBounds(0, 0, 3072, 768);
     this.cameras.main.startFollow(this.player);
     this.physics.world.setBounds(0, 0, 3072, 768); // ← même dimensions que la caméra
@@ -179,7 +179,7 @@ export default class niveau5 extends Phaser.Scene {
     });
 
     // création tp fin du niveau
-    this.teleporter = this.physics.add.sprite(3020, 620, 'tp01');
+    this.teleporter = this.physics.add.sprite(3020, 500, 'tp01');
     this.teleporter.body.allowGravity = false;
     this.teleporter.setImmovable(true);
 
@@ -192,14 +192,14 @@ export default class niveau5 extends Phaser.Scene {
     // création pièces
     this.groupe_pieces = this.physics.add.staticGroup();
     // Récupère le calque objet
-    const calque_objets = carten5.getObjectLayer('calque_objet5');
+    const calque_objets = carten6.getObjectLayer('piece_a_ramasse_n6');
 
     if (!calque_objets) {
       console.error("Calque pièces introuvable !");
     } else {
       calque_objets.objects.forEach(point => {
-        if (point.name == 'piecearamasser5') {
-          var nouvelle_piece = this.groupe_pieces.create(point.x, point.y, 'piece5');
+        if (point.name == 'piece') {
+          var nouvelle_piece = this.groupe_pieces.create(point.x, point.y, 'piece6');
           nouvelle_piece.setScale(0.5);
         }
       });
@@ -208,11 +208,26 @@ export default class niveau5 extends Phaser.Scene {
     // PERMET DE RAMASSER LES PIECES
     this.physics.add.overlap(this.player, this.groupe_pieces, this.ramasserPiece, null, this);
 
+    // COMPTEUR DE PIÈCES (fixe à l'écran, ne bouge pas avec la caméra)
+    this.totalPieces = this.groupe_pieces.getChildren().length;
+    this.textePieces = this.add.text(16, 16, '', {
+      fontSize: '20px',
+      fill: '#ffffff',
+      fontFamily: 'Orbitron',
+      backgroundColor: '#000000',
+      padding: { x: 8, y: 4 }
+    }).setScrollFactor(0).setDepth(10);
+
     // flag niveau complet
     this.niveauComplete = false;
   }
 
   update() {
+    // MISE À JOUR DU COMPTEUR DE PIÈCES
+    const piecesRestantes = this.groupe_pieces.countActive();
+    const piecesRamassees = this.totalPieces - piecesRestantes;
+    this.textePieces.setText('🪙 Pièces : ' + piecesRamassees + ' / ' + this.totalPieces);
+
     // touche triche : T = ramasse toutes les pièces sans valider le niveau
     if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('T'))) {
       this.groupe_pieces.getChildren().forEach(piece => {
@@ -248,7 +263,7 @@ export default class niveau5 extends Phaser.Scene {
     }
 
     if (Phaser.Input.Keyboard.JustDown(this.clavier.up)) {
-      if (this.musiqueNiveau5) this.musiqueNiveau5.stop();
+      if (this.musiqueNiveau6) this.musiqueNiveau6.stop();
       this.scene.start('pageprincipale');
     }
 
@@ -362,14 +377,14 @@ export default class niveau5 extends Phaser.Scene {
     // on ne valide que si toutes les pièces ont été ramassées
     if (this.niveauComplete) {
       let niveauxFinis = this.game.registry.get('niveauxFinis');
-      if (!niveauxFinis.includes('niveau5')) {
-        niveauxFinis.push('niveau5');
+      if (!niveauxFinis.includes('niveau6')) {
+        niveauxFinis.push('niveau6');
         this.game.registry.set('niveauxFinis', niveauxFinis);
       }
     }
 
     // retour tp menu principal
-    if (this.musiqueNiveau5) this.musiqueNiveau5.stop();
+    if (this.musiqueNiveau6) this.musiqueNiveau6.stop();
     this.scene.start('pageprincipale');
   }
 

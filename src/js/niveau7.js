@@ -1,6 +1,3 @@
-
-
-
 /***********************************************************************/
 /** VARIABLES GLOBALES 
 /***********************************************************************/
@@ -82,7 +79,7 @@ export default class niveau7 extends Phaser.Scene {
     // stoppe les anciennes musiques
     this.sound.stopAll();
 
-    // musique niveau 2
+    // musique niveau 7
     this.musiqueNiveau7 = this.sound.add("musiqueNiveau7", {
       loop: true,
       volume: 0.5
@@ -106,9 +103,7 @@ export default class niveau7 extends Phaser.Scene {
     calque_plateformes7.setCollisionByProperty({ estsolide: true });
     calque_death7.setCollisionByProperty({ estsolide: true });
 
-
-
-    this.player = this.physics.add.sprite(2950, 300, 'astronaut');
+    this.player = this.physics.add.sprite(300, 300, 'astronaut');
     this.player.setSize(50, 70);
     this.player.setOffset(36, 10);
     this.player.setCollideWorldBounds(true);
@@ -122,12 +117,12 @@ export default class niveau7 extends Phaser.Scene {
     this.cameras.main.startFollow(this.player);
     this.physics.world.setBounds(0, 0, 3072, 768); // ← même dimensions que la caméra
 
-    // collision"mort" player
+    // collision "mort" player
     this.physics.add.collider(this.player, calque_death7, () => {
       this.scene.restart(); // redémarre la scène actuelle
     });
 
-    //animations
+    // animations
     this.anims.create({
       key: 'anim_droite',
       frames: this.anims.generateFrameNumbers('astronaut', { start: 0, end: 3 }),
@@ -154,7 +149,7 @@ export default class niveau7 extends Phaser.Scene {
       key: 'sautdroit',
       frames: this.anims.generateFrameNumbers('astronaut', { start: 30, end: 35 }),
       frameRate: 10
-    })
+    });
 
     this.toucheGravite = this.input.keyboard.addKey('G');
 
@@ -214,7 +209,6 @@ export default class niveau7 extends Phaser.Scene {
 
     this.physics.add.collider(this.player, plateforme1);
     this.physics.add.collider(this.player, plateforme2);
-
 
     plateforme6.body.allowGravity = false;
     plateforme7.body.allowGravity = false;
@@ -307,7 +301,7 @@ export default class niveau7 extends Phaser.Scene {
       repeat: -1
     });
 
-    //haut droite
+    // haut droite
     tween11 = this.tweens.add({
       targets: plateforme11,
       paused: true,
@@ -366,7 +360,6 @@ export default class niveau7 extends Phaser.Scene {
     levier.setScale(0.8);
     levier.setSize(100, 100);
 
-
     levier2 = this.physics.add.staticSprite(1600, 135, "img_levier");
     levier2.active = false;
     levier2.flipX = false;
@@ -380,7 +373,6 @@ export default class niveau7 extends Phaser.Scene {
 
     this.aideLevier.setVisible(false);
     this.aideLevier.setDepth(10); // pour être au-dessus
-
 
     this.infoGravite = this.add.text(
       this.player.x,
@@ -412,26 +404,37 @@ export default class niveau7 extends Phaser.Scene {
 
     // PERMET DE RAMASSER LES PIECES
     this.physics.add.overlap(this.player, this.groupe_pieces, this.ramasserPiece, null, this);
-    
-    //initialisation flag
+
+    // COMPTEUR DE PIÈCES (fixe à l'écran, ne bouge pas avec la caméra)
+    this.totalPieces = this.groupe_pieces.getChildren().length;
+    this.textePieces = this.add.text(16, 16, '', {
+      fontSize: '20px',
+      fill: '#ffffff',
+      fontFamily: 'Orbitron',
+      backgroundColor: '#000000',
+      padding: { x: 8, y: 4 }
+    }).setScrollFactor(0).setDepth(10);
+
+    // initialisation flag
     this.niveauComplete = false;
-
-
-
-
   }
 
   update() {
+    // MISE À JOUR DU COMPTEUR DE PIÈCES
+    const piecesRestantes = this.groupe_pieces.countActive();
+    const piecesRamassees = this.totalPieces - piecesRestantes;
+    this.textePieces.setText('🪙 Pièces : ' + piecesRamassees + ' / ' + this.totalPieces);
+
     // touche triche : T = ramasse toutes les pièces sans valider le niveau
     if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('T'))) {
-    this.groupe_pieces.getChildren().forEach(piece => {
+      this.groupe_pieces.getChildren().forEach(piece => {
         piece.disableBody(true, true);
-    });
-    // vérifie si toutes les pièces sont ramassées
-    if (this.groupe_pieces.countActive() === 0) {
+      });
+      // vérifie si toutes les pièces sont ramassées
+      if (this.groupe_pieces.countActive() === 0) {
         this.niveauComplete = true;
+      }
     }
-}
 
     if (this.clavier.right.isDown) {
       this.player.setVelocityX(160);
@@ -449,15 +452,18 @@ export default class niveau7 extends Phaser.Scene {
         this.player.anims.play('immobilegauche', true);
       }
     }
+
     if (this.clavier.space.isDown && this.player.body.blocked.down) {
       this.player.setVelocityY(-250);
     }
+
     if (Phaser.Input.Keyboard.JustDown(this.clavier.up)) {
       if (this.musiqueNiveau7) {
         this.musiqueNiveau7.stop();
       }
       this.scene.start('pageprincipale');
     }
+
     // appuie sur G pour changer la gravité
     if (Phaser.Input.Keyboard.JustDown(this.toucheGravite)) {
       if (this.gravityInverted) {
@@ -473,7 +479,7 @@ export default class niveau7 extends Phaser.Scene {
       }
     }
 
-    // activation du levier : on est dessus et on appuie sur espace
+    // activation du levier : on est dessus et on appuie sur E
     if (Phaser.Input.Keyboard.JustDown(this.toucheLevier)) {
 
       if (this.physics.overlap(this.player, levier)) {
@@ -523,12 +529,6 @@ export default class niveau7 extends Phaser.Scene {
     } else {
       this.aideLevier.setVisible(false);
     }
-
-    // Touche de triche : T = terminer le niveau
-if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('T'))) {
-    this.niveauComplete = true;
-    this.finNiveau(this.player, this.teleporter);
-}
   }
 
   ramasserPiece(player, piece) {
@@ -536,28 +536,24 @@ if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('T'))) {
 
     // Si toutes les pièces du niveau sont ramassées → niveau terminé
     if (this.groupe_pieces.countActive() === 0) {
-        this.niveauComplete = true;
+      this.niveauComplete = true;
     }
-}
+  }
 
-finNiveau(player, teleporter) {
+  finNiveau(player, teleporter) {
     player.setVelocity(0);
     player.disableBody(true, true);
 
     // On ne valide que si toutes les pièces ont été ramassées
     if (this.niveauComplete) {
-        let niveauxFinis = this.game.registry.get('niveauxFinis');
-        if (!niveauxFinis.includes('niveau7')) { // ← changer le nom selon le niveau
-            niveauxFinis.push('niveau7');
-            this.game.registry.set('niveauxFinis', niveauxFinis);
-        }
+      let niveauxFinis = this.game.registry.get('niveauxFinis');
+      if (!niveauxFinis.includes('niveau7')) {
+        niveauxFinis.push('niveau7');
+        this.game.registry.set('niveauxFinis', niveauxFinis);
+      }
     }
 
     if (this.musiqueNiveau7) this.musiqueNiveau7.stop();
     this.scene.start('pageprincipale');
-
-
+  }
 }
-
-}
-

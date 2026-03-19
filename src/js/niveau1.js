@@ -66,7 +66,7 @@ export default class niveau1 extends Phaser.Scene {
     // Collision death — tue le joueur
     calque_death.setCollisionByProperty({ estSolide: true });
 
-    this.player = this.physics.add.sprite(2950, 450, 'astronaut');
+    this.player = this.physics.add.sprite(120, 'astronaut');
     this.player.setSize(50, 70);
     this.player.setOffset(36, 10);
     this.player.setCollideWorldBounds(true);
