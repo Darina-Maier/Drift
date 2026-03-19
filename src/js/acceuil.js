@@ -63,15 +63,7 @@ export default class acceuil extends Phaser.Scene {
         // Clic → lance la scène Selection
         bouton_play.on("pointerup", () => {
             this.scene.start("intro");
-<<<<<<< HEAD
         });
-=======
-        }); if (!this.game.musiqueMenu) {
-            this.game.musiqueMenu = this.sound.add('ArriveSurTerre', {
-                loop: true,
-                volume: 0.5
-            });
->>>>>>> 864416b85afe122d7ca1f3a7370d47ff893e8662
 
         // Relancer la musique menu si elle n'est pas en cours
         if (!this.game.musiqueMenu || !this.game.musiqueMenu.isPlaying) {
