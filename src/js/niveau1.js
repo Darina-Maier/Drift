@@ -23,7 +23,7 @@ export default class niveau1 extends Phaser.Scene {
     this.load.image("e5", "src/assets/elemn1/en5.png");
     this.load.image("e6", "src/assets/elemn1/en6.png");
 
-// chargement de la musique du niveau 1
+    // chargement de la musique du niveau 1
     this.load.audio("musiqueNiveau1", "src/assets/sons/niveau1.ogg");
     // chargement des 9 images du téléporteur
     this.load.image('tp01', 'src/assets/teleporter/tp01.png');
