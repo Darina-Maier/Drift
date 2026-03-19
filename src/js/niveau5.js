@@ -137,7 +137,7 @@ export default class niveau5 extends Phaser.Scene {
 
     this.clavier = this.input.keyboard.createCursorKeys();
 
-    this.physics.world.on("worldbounds", function(body) {
+    this.physics.world.on("worldbounds", function (body) {
       var objet = body.gameObject;
       if (groupeBullets.contains(objet)) {
         objet.destroy();
@@ -208,21 +208,34 @@ export default class niveau5 extends Phaser.Scene {
     // PERMET DE RAMASSER LES PIECES
     this.physics.add.overlap(this.player, this.groupe_pieces, this.ramasserPiece, null, this);
 
+    /// affichage du nombre de pièces restantes
+    this.totalPieces = this.groupe_pieces.getChildren().length;
+    this.textePieces = this.add.text(16, 16, '', {
+      fontSize: '20px',
+      fill: '#ffffff',
+      fontFamily: 'Orbitron',
+      backgroundColor: '#000000',
+      padding: { x: 8, y: 4 }
+    }).setScrollFactor(0).setDepth(10);
+
     // flag niveau complet
     this.niveauComplete = false;
   }
 
   update() {
-    // touche triche : T = ramasse toutes les pièces sans valider le niveau
-    if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('T'))) {
-      this.groupe_pieces.getChildren().forEach(piece => {
-        piece.disableBody(true, true);
-      });
-      // vérifie si toutes les pièces sont ramassées
-      if (this.groupe_pieces.countActive() === 0) {
-        this.niveauComplete = true;
-      }
-    }
+    const piecesRestantes = this.groupe_pieces.countActive();
+    const piecesRamassees = this.totalPieces - piecesRestantes;
+    this.textePieces.setText('🪙 Pièces : ' + piecesRamassees + ' / ' + this.totalPieces);
+    /// touche triche : T = ramasse toutes les pièces sans valider le niveau
+    // if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('T'))) {
+    //  this.groupe_pieces.getChildren().forEach(piece => {
+    //    piece.disableBody(true, true);
+    // });
+    // vérifie si toutes les pièces sont ramassées
+    // if (this.groupe_pieces.countActive() === 0) {
+    //   this.niveauComplete = true;
+    // }
+    // }
 
     if (!this.isTir) {
       if (this.clavier.right.isDown) {
@@ -374,141 +387,141 @@ export default class niveau5 extends Phaser.Scene {
   }
 
   ramasserPiece(player, piece) {
-  if (Phaser.Input.Keyboard.JustDown(boutonFeu)) {
-    this.isTir = true;
+    if (Phaser.Input.Keyboard.JustDown(boutonFeu)) {
+      this.isTir = true;
 
-    if (this.player.direction == 'droite') {
-      this.player.anims.play('tir_droite');
-    } else {
-      this.player.anims.play('tir_gauche');
-    }
-
-    this.tirer(this.player);
-
-    this.time.delayedCall(300, () => {
-      this.isTir = false;
-    });
-  }
-
-  // appuie sur G pour changer la gravité 
-if (Phaser.Input.Keyboard.JustDown(this.toucheGravite)) {
-    if (this.gravityInverted == true) {
-            this.player.body.gravity.y = -600;  // gravité vers le bas
-this.gravityInverted = false;
-//    this.physics.world.gravity.y = -200; // gravité vers le haut
-    this.player.setFlipY(true); // retourne le sprite du joueur
+      if (this.player.direction == 'droite') {
+        this.player.anims.play('tir_droite');
       } else {
-      this.gravityInverted = true;
-      this.player.body.gravity.y = 0;  // gravité vers le bas
-      this.player.setFlipY(false); // remet le sprite du joueur à l'endroit
+        this.player.anims.play('tir_gauche');
+      }
 
+      this.tirer(this.player);
+
+      this.time.delayedCall(300, () => {
+        this.isTir = false;
+      });
+    }
+
+    // appuie sur G pour changer la gravité 
+    if (Phaser.Input.Keyboard.JustDown(this.toucheGravite)) {
+      if (this.gravityInverted == true) {
+        this.player.body.gravity.y = -600;  // gravité vers le bas
+        this.gravityInverted = false;
+        //    this.physics.world.gravity.y = -200; // gravité vers le haut
+        this.player.setFlipY(true); // retourne le sprite du joueur
+      } else {
+        this.gravityInverted = true;
+        this.player.body.gravity.y = 0;  // gravité vers le bas
+        this.player.setFlipY(false); // remet le sprite du joueur à l'endroit
+
+      }
     }
   }
-}
 
   creerMeteorite() {
 
-   
-  let frameAleatoire = Phaser.Math.Between(0, 3);
-  let xAleatoire = Phaser.Math.Between(this.player.x - 300, this.player.x + 300);
-  xAleatoire = Phaser.Math.Clamp(xAleatoire, 50, 3000);
-  let meteorite = this.groupeMeteorites.create(xAleatoire, this.player.y - 400, 'meteorites', frameAleatoire);
-   
-  meteorite.body.allowGravity = false;
-  meteorite.setVelocityY(20);
 
-  meteorite.setVelocityX(Phaser.Math.Between(-30, 30));
-  meteorite.setBounce(0);
-  meteorite.setScale(0.3);
-  meteorite.setSize(100, 100);
-}
+    let frameAleatoire = Phaser.Math.Between(0, 3);
+    let xAleatoire = Phaser.Math.Between(this.player.x - 300, this.player.x + 300);
+    xAleatoire = Phaser.Math.Clamp(xAleatoire, 50, 3000);
+    let meteorite = this.groupeMeteorites.create(xAleatoire, this.player.y - 400, 'meteorites', frameAleatoire);
 
-tirer(player) {
+    meteorite.body.allowGravity = false;
+    meteorite.setVelocityY(20);
 
-
-  let coefDir;
-
-  if (player.direction == 'gauche') {
-    coefDir = -1;
-  } else {
-    coefDir = 1;
+    meteorite.setVelocityX(Phaser.Math.Between(-30, 30));
+    meteorite.setBounce(0);
+    meteorite.setScale(0.3);
+    meteorite.setSize(100, 100);
   }
 
-  // création de la balle à côté du joueur
-  let bullet = groupeBullets.create(player.x + (25 * coefDir), player.y - 4, 'bullet');
+  tirer(player) {
 
-  bullet.setScale(0.5);
-  bullet.setSize(50,50);
-  bullet.body.allowGravity = false;
 
-  bullet.setCollideWorldBounds(true);
-  bullet.body.onWorldBounds = true;
+    let coefDir;
 
-  // vitesse de la balle
-  bullet.setVelocity(700 * coefDir, 0);
-}
+    if (player.direction == 'gauche') {
+      coefDir = -1;
+    } else {
+      coefDir = 1;
+    }
 
-hitMeteorite(bullet, meteorite) {
+    // création de la balle à côté du joueur
+    let bullet = groupeBullets.create(player.x + (25 * coefDir), player.y - 4, 'bullet');
 
-  // destruction de la balle
-  bullet.destroy();
+    bullet.setScale(0.5);
+    bullet.setSize(50, 50);
+    bullet.body.allowGravity = false;
 
-  // destruction de la météorite
-  meteorite.destroy();
-}
+    bullet.setCollideWorldBounds(true);
+    bullet.body.onWorldBounds = true;
 
-toucheMeteorite(player, meteorite) {
-
-  // destruction de la météorite
-  meteorite.destroy();
-
-  // le joueur perd une vie
-  this.vies--;
-
-  // effet visuel rouge
-  player.setTint(0xff0000);
-
-  // petit recul
-  player.setVelocityY(-200);
-
-  // enlève la teinte rouge après un court instant
-  this.time.delayedCall(200, () => {
-    player.clearTint();
-  });
-
-  // affiche le nombre de vies restant dans la console
-  console.log("Vies restantes :", this.vies);
-
-  // si le joueur n'a plus de vie
-  if (this.vies <= 0) {
-    this.scene.restart();
-  }
-}
-
-finNiveau(player, teleporter) {
-  // Empêcher les appels multiples
-  if (this.finNiveauAppele) return;
-  this.finNiveauAppele = true;
-
-  // optionnel : désactiver le joueur pour éviter multi déclenchement
-  player.setVelocity(0);
-  player.disableBody(true, true);
-
-  // Arrêter la musique du niveau 5
-  if (this.musiqueNiveau5) {
-    this.musiqueNiveau5.stop();
+    // vitesse de la balle
+    bullet.setVelocity(700 * coefDir, 0);
   }
 
-  // Fondu progressif (fade out)
-  this.cameras.main.fadeOut(1500, 0, 0, 0);
+  hitMeteorite(bullet, meteorite) {
 
-  // Attendre la fin du fondu puis changer de niveau
-  this.time.delayedCall(1500, () => {
-    this.scene.start('pageprincipale');
-  });
-}
+    // destruction de la balle
+    bullet.destroy();
 
-ramasserPiece(player, piece) {
+    // destruction de la météorite
+    meteorite.destroy();
+  }
+
+  toucheMeteorite(player, meteorite) {
+
+    // destruction de la météorite
+    meteorite.destroy();
+
+    // le joueur perd une vie
+    this.vies--;
+
+    // effet visuel rouge
+    player.setTint(0xff0000);
+
+    // petit recul
+    player.setVelocityY(-200);
+
+    // enlève la teinte rouge après un court instant
+    this.time.delayedCall(200, () => {
+      player.clearTint();
+    });
+
+    // affiche le nombre de vies restant dans la console
+    console.log("Vies restantes :", this.vies);
+
+    // si le joueur n'a plus de vie
+    if (this.vies <= 0) {
+      this.scene.restart();
+    }
+  }
+
+  finNiveau(player, teleporter) {
+    // Empêcher les appels multiples
+    if (this.finNiveauAppele) return;
+    this.finNiveauAppele = true;
+
+    // optionnel : désactiver le joueur pour éviter multi déclenchement
+    player.setVelocity(0);
+    player.disableBody(true, true);
+
+    // Arrêter la musique du niveau 5
+    if (this.musiqueNiveau5) {
+      this.musiqueNiveau5.stop();
+    }
+
+    // Fondu progressif (fade out)
+    this.cameras.main.fadeOut(1500, 0, 0, 0);
+
+    // Attendre la fin du fondu puis changer de niveau
+    this.time.delayedCall(1500, () => {
+      this.scene.start('pageprincipale');
+    });
+  }
+
+  ramasserPiece(player, piece) {
     piece.disableBody(true, true);
 
     // si toutes les pièces sont ramassées → niveau complet

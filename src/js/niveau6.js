@@ -228,16 +228,16 @@ export default class niveau6 extends Phaser.Scene {
     const piecesRamassees = this.totalPieces - piecesRestantes;
     this.textePieces.setText('🪙 Pièces : ' + piecesRamassees + ' / ' + this.totalPieces);
 
-    // touche triche : T = ramasse toutes les pièces sans valider le niveau
-    if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('T'))) {
-      this.groupe_pieces.getChildren().forEach(piece => {
-        piece.disableBody(true, true);
-      });
-      // vérifie si toutes les pièces sont ramassées
-      if (this.groupe_pieces.countActive() === 0) {
-        this.niveauComplete = true;
-      }
-    }
+    /// touche triche : T = ramasse toutes les pièces sans valider le niveau
+    // if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('T'))) {
+    //  this.groupe_pieces.getChildren().forEach(piece => {
+    //    piece.disableBody(true, true);
+    // });
+    // vérifie si toutes les pièces sont ramassées
+    // if (this.groupe_pieces.countActive() === 0) {
+    //   this.niveauComplete = true;
+    // }
+    // }
 
     if (!this.isTir) {
       if (this.clavier.right.isDown) {

@@ -43,7 +43,7 @@ export default class niveau3 extends Phaser.Scene {
       frameWidth: 130,
       frameHeight: 90
     });
-    
+
     this.load.spritesheet('ennemi3', 'src/assets/ami3.png', {
       frameWidth: 100,  // 410 / 4 = ~102
       frameHeight: 156
@@ -136,8 +136,17 @@ export default class niveau3 extends Phaser.Scene {
     // PERMET DE RAMASSER LES PIECES
     this.physics.add.overlap(this.player, this.groupe_pieces, ramasserPiece, null, this);
 
+    /// affichage du nombre de pièces restantes
+    this.totalPieces = this.groupe_pieces.getChildren().length;
+    this.textePieces = this.add.text(16, 16, '', {
+      fontSize: '20px',
+      fill: '#ffffff',
+      fontFamily: 'Orbitron',
+      backgroundColor: '#000000',
+      padding: { x: 8, y: 4 }
+    }).setScrollFactor(0).setDepth(10);
 
-   
+
     // Si joueur touche ennemi → restart
     this.physics.add.overlap(this.player, this.groupe_ennemis, () => {
       this.scene.restart();
@@ -159,38 +168,53 @@ export default class niveau3 extends Phaser.Scene {
     boutoncourir = this.input.keyboard.addKey('C');
 
     // animation du téléporteur avec les 9 images
-this.anims.create({
-  key: 'anim_teleporter',
-  frames: [
-    { key: 'tp01' },
-    { key: 'tp02' },
-    { key: 'tp03' },
-    { key: 'tp04' },
-    { key: 'tp05' },
-    { key: 'tp06' },
-    { key: 'tp07' },
-    { key: 'tp08' },
-    { key: 'tp09' }
-  ],
-  frameRate: 10, // vitesse de rotation
-  repeat: -1     // boucle infinie
-});
+    this.anims.create({
+      key: 'anim_teleporter',
+      frames: [
+        { key: 'tp01' },
+        { key: 'tp02' },
+        { key: 'tp03' },
+        { key: 'tp04' },
+        { key: 'tp05' },
+        { key: 'tp06' },
+        { key: 'tp07' },
+        { key: 'tp08' },
+        { key: 'tp09' }
+      ],
+      frameRate: 10, // vitesse de rotation
+      repeat: -1     // boucle infinie
+    });
 
-// création tp fin du niveau
-this.teleporter = this.physics.add.sprite(3010, 320, 'tp01');
-this.teleporter.body.allowGravity = false;
-this.teleporter.setImmovable(true);
+    // création tp fin du niveau
+    this.teleporter = this.physics.add.sprite(3010, 320, 'tp01');
+    this.teleporter.body.allowGravity = false;
+    this.teleporter.setImmovable(true);
 
-// animation en boucle 
-this.teleporter.anims.play('anim_teleporter');
-this.teleporter.setScale(0.3);
-this.teleporter.setSize(90,200);
-this.physics.add.overlap(this.player, this.teleporter, this.finNiveau, null, this);
+    // animation en boucle 
+    this.teleporter.anims.play('anim_teleporter');
+    this.teleporter.setScale(0.3);
+    this.teleporter.setSize(90, 200);
+    this.physics.add.overlap(this.player, this.teleporter, this.finNiveau, null, this);
 
   }
 
 
   update() {
+    const piecesRestantes = this.groupe_pieces.countActive();
+    const piecesRamassees = this.totalPieces - piecesRestantes;
+    this.textePieces.setText('🪙 Pièces : ' + piecesRamassees + ' / ' + this.totalPieces);
+
+    /// touche triche : T = ramasse toutes les pièces sans valider le niveau
+    // if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('T'))) {
+    //  this.groupe_pieces.getChildren().forEach(piece => {
+    //    piece.disableBody(true, true);
+    // });
+    // vérifie si toutes les pièces sont ramassées
+    // if (this.groupe_pieces.countActive() === 0) {
+    //   this.niveauComplete = true;
+    // }
+    // }
+
     // DÉPLACEMENTS joueur
     if (this.graviteDirection == 'bas' || this.graviteDirection == 'haut') {
       if (boutoncourir.isDown && this.clavier.right.isDown) {
@@ -262,20 +286,20 @@ this.physics.add.overlap(this.player, this.teleporter, this.finNiveau, null, thi
       }
     }
 
-   
+
     // ENNEMIS — sautent selon gravité
     this.groupe_ennemis.children.iterate((ennemi) => {
-    this.orienterSprite(ennemi);
+      this.orienterSprite(ennemi);
 
-    if (this.graviteDirection == 'bas' || this.graviteDirection == 'haut') {
+      if (this.graviteDirection == 'bas' || this.graviteDirection == 'haut') {
         // Gravité verticale → gravité normale + saut haut
         ennemi.body.gravity.set(0, 0); // suit la gravité mondiale
         if (this.graviteDirection == 'bas' && ennemi.body.blocked.down) {
-            if (Phaser.Math.Between(0, 100) < 5) { ennemi.setVelocityY(-350); }
+          if (Phaser.Math.Between(0, 100) < 5) { ennemi.setVelocityY(-350); }
         } else if (this.graviteDirection == 'haut' && ennemi.body.blocked.up) {
-            if (Phaser.Math.Between(0, 100) < 5) { ennemi.setVelocityY(350); }
+          if (Phaser.Math.Between(0, 100) < 5) { ennemi.setVelocityY(350); }
         }
-    } else {
+      } else {
         // Gravité horizontale → flotte très lentement
         ennemi.body.gravity.set(0, 0);
         ennemi.body.velocity.x = Phaser.Math.Linear(ennemi.body.velocity.x, 0, 0.05); // ralentit doucement
@@ -283,11 +307,11 @@ this.physics.add.overlap(this.player, this.teleporter, this.finNiveau, null, thi
 
         // Légère dérive aléatoire très lente
         if (Phaser.Math.Between(0, 200) < 1) {
-            ennemi.setVelocityX(Phaser.Math.Between(-30, 30));
-            ennemi.setVelocityY(Phaser.Math.Between(-30, 30));
+          ennemi.setVelocityX(Phaser.Math.Between(-30, 30));
+          ennemi.setVelocityY(Phaser.Math.Between(-30, 30));
         }
-    }
-});
+      }
+    });
   }
 
 

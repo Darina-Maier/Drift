@@ -163,11 +163,35 @@ export default class niveau4 extends Phaser.Scene {
     // PERMET DE RAMASSER LES PIECES
     this.physics.add.overlap(this.player, this.groupe_pieces, this.ramasserPiece, null, this);
 
+    /// affichage du nombre de pièces restantes
+    this.totalPieces = this.groupe_pieces.getChildren().length;
+    this.textePieces = this.add.text(16, 16, '', {
+      fontSize: '20px',
+      fill: '#ffffff',
+      fontFamily: 'Orbitron',
+      backgroundColor: '#000000',
+      padding: { x: 8, y: 4 }
+    }).setScrollFactor(0).setDepth(10);
+
     // flag niveau complet
     this.niveauComplete = false;
   }
 
   update() {
+    const piecesRestantes = this.groupe_pieces.countActive();
+    const piecesRamassees = this.totalPieces - piecesRestantes;
+    this.textePieces.setText('🪙 Pièces : ' + piecesRamassees + ' / ' + this.totalPieces);
+    /// touche triche : T = ramasse toutes les pièces sans valider le niveau
+    // if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('T'))) {
+    //  this.groupe_pieces.getChildren().forEach(piece => {
+    //    piece.disableBody(true, true);
+    // });
+    // vérifie si toutes les pièces sont ramassées
+    // if (this.groupe_pieces.countActive() === 0) {
+    //   this.niveauComplete = true;
+    // }
+    // }
+
     // touche triche : T = ramasse toutes les pièces sans valider le niveau
     if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('T'))) {
       this.groupe_pieces.getChildren().forEach(piece => {

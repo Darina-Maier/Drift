@@ -132,11 +132,12 @@ export default class niveau1 extends Phaser.Scene {
 
     this.physics.add.overlap(this.player, this.groupe_pieces, this.ramasserPiece, null, this);
 
-    // affichage du nombre de pièces restantes
+    /// affichage du nombre de pièces restantes
     this.totalPieces = this.groupe_pieces.getChildren().length;
     this.textePieces = this.add.text(16, 16, '', {
       fontSize: '20px',
       fill: '#ffffff',
+      fontFamily: 'Orbitron',
       backgroundColor: '#000000',
       padding: { x: 8, y: 4 }
     }).setScrollFactor(0).setDepth(10);
