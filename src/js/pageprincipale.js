@@ -246,6 +246,12 @@ export default class pageprincipale extends Phaser.Scene {
             if (this.physics.overlap(player, p5)) {
                 this.scene.start('niveau5');
             }
+            if (this.physics.overlap(player, p6)) {
+                 this.scene.start('niveau6');
+            }
+            if (this.physics.overlap(player, p7)) {
+                this.scene.start('niveau7');
+            }
         }
     }
 }
