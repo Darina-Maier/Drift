@@ -112,18 +112,18 @@ export default class pageprincipale extends Phaser.Scene {
         document.fonts.load('16px Orbitron').then(() => {
         });
         // ajout des noms des planètes 
-        this.add.text(224, 500, 'Planète\nMAKHCHAN', { fontSize: '16px', fill: '#fff', fontFamily: 'Orbitron', align: 'center' }).setOrigin(0.5);
-        this.add.text(470, 500, 'Planète\nFRAGALE', { fontSize: '16px', fill: '#fff', fontFamily: 'Orbitron', align: 'center' }).setOrigin(0.5);
-        this.add.text(716, 500, 'Planète\nDURAND', { fontSize: '16px', fill: '#fff', fontFamily: 'Orbitron', align: 'center' }).setOrigin(0.5);
-        this.add.text(962, 500, 'Planète\nJOUSSET', { fontSize: '16px', fill: '#fff', fontFamily: 'Orbitron', align: 'center' }).setOrigin(0.5);
-        this.add.text(1208, 500, 'Planète\nMEYER', { fontSize: '16px', fill: '#fff', fontFamily: 'Orbitron', align: 'center' }).setOrigin(0.5);
-        this.add.text(1454, 500, 'Planète\nALONZO', { fontSize: '16px', fill: '#fff', fontFamily: 'Orbitron', align: 'center' }).setOrigin(0.5);
-        this.add.text(1700, 500, 'Planète\nDARTIES', { fontSize: '16px', fill: '#fff', fontFamily: 'Orbitron', align: 'center' }).setOrigin(0.5);
-        this.add.text(1946, 500, 'Planète\nTERRE', { fontSize: '16px', fill: '#fff', fontFamily: 'Orbitron', align: 'center' }).setOrigin(0.5);
+        this.add.text(224, 520, 'Planète\nMAKHCHAN', { fontSize: '16px', fill: '#fff', fontFamily: 'Orbitron', align: 'center' }).setOrigin(0.5);
+        this.add.text(470, 520, 'Planète\nFRAGALE', { fontSize: '16px', fill: '#fff', fontFamily: 'Orbitron', align: 'center' }).setOrigin(0.5);
+        this.add.text(716, 520, 'Planète\nDURAND', { fontSize: '16px', fill: '#fff', fontFamily: 'Orbitron', align: 'center' }).setOrigin(0.5);
+        this.add.text(962, 520, 'Planète\nJOUSSET', { fontSize: '16px', fill: '#fff', fontFamily: 'Orbitron', align: 'center' }).setOrigin(0.5);
+        this.add.text(1208, 520, 'Planète\nMEYER', { fontSize: '16px', fill: '#fff', fontFamily: 'Orbitron', align: 'center' }).setOrigin(0.5);
+        this.add.text(1454, 520, 'Planète\nALONZO', { fontSize: '16px', fill: '#fff', fontFamily: 'Orbitron', align: 'center' }).setOrigin(0.5);
+        this.add.text(1700, 520, 'Planète\nDARTIES', { fontSize: '16px', fill: '#fff', fontFamily: 'Orbitron', align: 'center' }).setOrigin(0.5);
+        this.add.text(1946, 520, 'Planète\nTERRE', { fontSize: '16px', fill: '#fff', fontFamily: 'Orbitron', align: 'center' }).setOrigin(0.5);
 
             //création joueur 
             player = this.physics.add.sprite(0, 10, 'astronaut');
-            player.setSize(65, 45);
+            player.setSize(40, 65);
             player.direction = 'droite'
 
             //parametres joueur 
@@ -190,6 +190,11 @@ export default class pageprincipale extends Phaser.Scene {
             frameRate: 10,
             repeat: -1
         });
+
+        // Dans create(), remplace ou complète ta plateforme existante
+        const sol = this.add.rectangle(1024, 490, 2048, 20); // invisible (pas de couleur)
+        this.physics.add.existing(sol, true); // true = statique
+        this.physics.add.collider(player, sol);
 
     }
 
