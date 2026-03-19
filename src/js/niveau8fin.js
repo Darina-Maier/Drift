@@ -4,6 +4,7 @@ export default class niveau8fin extends Phaser.Scene {
     }
 
     preload() {
+        this.load.audio("musiqueNiveau8", "src/assets/sons/niveau8.ogg");
         this.load.image("fusee", "src/assets/fusee.png");
         this.load.image("flammes", "src/assets/flammes.png");
         this.load.spritesheet('astronaut', 'src/assets/astronaut.png', {
@@ -21,8 +22,16 @@ export default class niveau8fin extends Phaser.Scene {
     create() {
         this.cameras.main.setBackgroundColor('#000011');
 
+        // ── MUSIQUE ───────────────────────────────────────────────
+        this.sound.stopAll();
+        this.musiqueNiveau8 = this.sound.add("musiqueNiveau8", {
+            loop: true,
+            volume: 0.5
+        });
+        this.musiqueNiveau8.play();
+
         // ── ÉTOILES ───────────────────────────────────────────────
-        for (let i = 0; i < 80; i++) {
+        for (let i = 0; i < 300; i++) {
             this.add.circle(
                 Phaser.Math.Between(0, 1024),
                 Phaser.Math.Between(0, 768),
@@ -264,10 +273,12 @@ export default class niveau8fin extends Phaser.Scene {
         boutonAccueil.on('pointerout',  () => boutonAccueil.setStyle({ backgroundColor: '#004488' }));
 
         boutonRejouer.on('pointerup', () => {
+            this.sound.stopAll();
             this.game.registry.set('niveauxFinis', []);
             this.scene.start('pageprincipale');
         });
         boutonAccueil.on('pointerup', () => {
+            this.sound.stopAll();
             this.game.registry.set('niveauxFinis', []);
             this.scene.start('acceuil');
         });

@@ -52,13 +52,19 @@ export default class acceuil extends Phaser.Scene {
         // Clic → lance la scène Selection
         bouton_play.on("pointerup", () => {
             this.scene.start("intro");
-        });if (!this.game.musiqueMenu) {
-            this.game.musiqueMenu = this.sound.add('ArriveSurTerre', {
-                loop: true,
-                volume: 0.5
-            });
+        });
 
-            this.game.musiqueMenu.play();
+        // Relancer la musique menu si elle n'est pas en cours
+        if (!this.game.musiqueMenu || !this.game.musiqueMenu.isPlaying) {
+            if (this.game.musiqueMenu) {
+                this.game.musiqueMenu.play();
+            } else {
+                this.game.musiqueMenu = this.sound.add('ArriveSurTerre', {
+                    loop: true,
+                    volume: 0.5
+                });
+                this.game.musiqueMenu.play();
+            }
         }
     }
 }
