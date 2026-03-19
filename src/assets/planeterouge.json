@@ -1,11 +1,4 @@
 { "compressionlevel":-1,
- "editorsettings":
-    {
-     "export":
-        {
-         "format":"json"
-        }
-    },
  "height":24,
  "infinite":false,
  "layers":[
@@ -41,6 +34,101 @@
          "type":"tilelayer",
          "visible":true,
          "width":96,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":10,
+         "name":"calque_objet1",
+         "objects":[
+                {
+                 "height":0,
+                 "id":1,
+                 "name":"piecearamasser1",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1426.66666666667,
+                 "y":313.333333333333
+                }, 
+                {
+                 "height":0,
+                 "id":2,
+                 "name":"piecearamasser1",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1818.66666666667,
+                 "y":40
+                }, 
+                {
+                 "height":0,
+                 "id":3,
+                 "name":"piecearamasser1",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2192,
+                 "y":533.333333333333
+                }, 
+                {
+                 "height":0,
+                 "id":4,
+                 "name":"piecearamasser1",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":692,
+                 "y":280
+                }, 
+                {
+                 "height":0,
+                 "id":5,
+                 "name":"piecearamasser1",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":273.333333333333,
+                 "y":153.333333333333
+                }, 
+                {
+                 "height":0,
+                 "id":6,
+                 "name":"piecearamasser1",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2849.33333333333,
+                 "y":601.333333333333
+                }, 
+                {
+                 "height":0,
+                 "id":7,
+                 "name":"piecearamasser1",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2742.66666666667,
+                 "y":184
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
          "x":0,
          "y":0
         }, 
@@ -114,11 +202,11 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":10,
- "nextobjectid":1,
+ "nextlayerid":11,
+ "nextobjectid":8,
  "orientation":"orthogonal",
  "renderorder":"right-down",
- "tiledversion":"1.11.2",
+ "tiledversion":"1.12.0",
  "tileheight":32,
  "tilesets":[
         {

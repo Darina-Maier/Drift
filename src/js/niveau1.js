@@ -16,12 +16,7 @@ export default class niveau1 extends Phaser.Scene {
     this.load.image("plat2", "src/assets/tuilesn1/platform2.png");
     this.load.image("plat3", "src/assets/tuilesn1/platform3.png");
 
-    this.load.image("e1", "src/assets/elemn1/en1.png");
-    this.load.image("e2", "src/assets/elemn1/en2.png");
-    this.load.image("e3", "src/assets/elemn1/en3.png");
-    this.load.image("e4", "src/assets/elemn1/en4.png");
-    this.load.image("e5", "src/assets/elemn1/en5.png");
-    this.load.image("e6", "src/assets/elemn1/en6.png");
+    this.load.image('piece1', 'src/assets/tuilesn1/piece1.png');
 
     // chargement de la musique du niveau 1
     this.load.audio("musiqueNiveau1", "src/assets/sons/niveau1.ogg");
@@ -90,15 +85,7 @@ export default class niveau1 extends Phaser.Scene {
     this.toucheGravite = this.input.keyboard.addKey('G');
     boutoncourir = this.input.keyboard.addKey('C');
 
-    //mise en place en1
-    var groupe_en1 = this.physics.add.group();
-
-    var en1Images = ["e1", "e2", "e3", "e4", "e5", "e6"]
-    for (let i = 0; i < 6; i++) {
-      var coordX = 150 + 600 * i;
-      var coordY = 0;
-      groupe_en1.create(coordX, coordY, en1Images[i]);
-    };
+    
     this.physics.add.collider(this.player, calque_plateformes);
     this.physics.add.collider(this.player, calque_death, () => {
       if (this.musiqueNiveau1) {
@@ -107,8 +94,7 @@ export default class niveau1 extends Phaser.Scene {
       this.scene.restart();
     });
 
-    this.physics.add.collider(groupe_en1, calque_plateformes);
-    this.physics.add.overlap(this.player, groupe_en1, ramasseren1, null, this);
+    
     this.gravityInverted == false;
 
     // animation du téléporteur avec les 9 images
@@ -139,6 +125,23 @@ this.teleporter.anims.play('anim_teleporter');
 this.teleporter.setScale(0.3);
 this.teleporter.setSize(150,200);
 this.physics.add.overlap(this.player, this.teleporter, this.finNiveau, null, this);
+
+//piece1 (anciennement e1)
+this.groupe_pieces = this.physics.add.staticGroup();
+const calque_objets = carteDuNiveau.getObjectLayer('calque_objet1');
+
+if (!calque_objets) {
+    console.error("Calque objet introuvable !");
+} else {
+    calque_objets.objects.forEach(point => {
+        if (point.name == 'piecearamasser1') {
+            var nouvelle_piece = this.groupe_pieces.create(point.x, point.y, 'piece1');
+            nouvelle_piece.setScale(0.5);
+        }
+    });
+}
+
+this.physics.add.overlap(this.player, this.groupe_pieces, this.ramasserPiece, null, this);
 
   }
 
@@ -209,14 +212,12 @@ finNiveau(player, teleporter) {
   // retour tp menu principal
   this.scene.start('pageprincipale');
 }
-
+  ramasserPiece(player, piece) {
+    piece.disableBody(true, true);
+}
 }
 
 //autres fonctions 
 //fonction ramasser element
-function ramasseren1(personnage, element) {
-  element.disableBody(true, true);
 
-
-}
 
