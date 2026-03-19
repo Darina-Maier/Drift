@@ -19,7 +19,7 @@ export default class niveau3 extends Phaser.Scene {
     this.load.image("t1", "src/assets/tuilesn3/Tileset_n3.png");
 
     // chargement de la carte
-    this.load.tilemapTiledJSON("carte", "src/assets/map_n3.json");
+    this.load.tilemapTiledJSON("carte3", "src/assets/map_n3.json");
 
     // chargement des 9 images du téléporteur
     this.load.image('tp01', 'src/assets/teleporter/tp01.png');
@@ -60,7 +60,7 @@ export default class niveau3 extends Phaser.Scene {
     });
     this.musiqueNiveau3.play();
 
-    const carten3 = this.add.tilemap("carte");
+    const carten3 = this.add.tilemap("carte3");
 
     // chargement du jeu de tuiles
     const ts_bg = carten3.addTilesetImage("background_alien", "bg");
