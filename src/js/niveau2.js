@@ -1,4 +1,4 @@
-/***********************************************************************/
+//***********************************************************************/
 /** VARIABLES GLOBALES 
 /***********************************************************************/
 var player;
@@ -305,5 +305,4 @@ function ramasserPiece(player, piece) {
   piece.disableBody(true, true);
   // Ici tu peux ajouter du code pour augmenter le score ou autre
 }
-
 

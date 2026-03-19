@@ -1,6 +1,3 @@
-
-
-
 /***********************************************************************/
 /** VARIABLES GLOBALES 
 /***********************************************************************/
@@ -8,144 +5,315 @@ var player;
 var clavier;
 
 export default class niveau6 extends Phaser.Scene {
-  // constructeur de la classe
+
   constructor() {
     super({
-      key: "niveau6" //  ici on précise le nom de la classe en tant qu'identifiant
+      key: "niveau6"
     });
   }
-
 
   preload() {
     this.load.audio("musiqueNiveau6", "src/assets/sons/niveau6.ogg");
-
     this.load.image("bg6", "src/assets/tuilesn6/2_game_background.png");
     this.load.image("t6", "src/assets/tuilesn6/alien-planet-tileset.png");
-    
-    // chargement de la carte
-    this.load.tilemapTiledJSON("carte6", "src/assets/map_n6.json"); 
 
-    this.load.spritesheet('astronaut', 'src/assets/astronaut.png', {
-        frameWidth: 130,
-        frameHeight: 90
+    // carte
+    this.load.tilemapTiledJSON("carte6", "src/assets/map_n6.json");
+
+    // joueur
+    this.load.spritesheet("astronaut", "src/assets/astronaut.png", {
+      frameWidth: 130,
+      frameHeight: 90
     });
-    this.load.spritesheet('astronautinverse', 'src/assets/astronautinverse.png', {
-        frameWidth: 130,
-        frameHeight: 90
+
+    this.load.spritesheet("astronautinverse", "src/assets/astronautinverse.png", {
+      frameWidth: 130,
+      frameHeight: 90
     });
+
+    // ennemi
+    this.load.spritesheet("fishrobot", "src/assets/fishrobot.png", {
+      frameWidth: 41,
+      frameHeight: 61
+    });
+
+    // pièce
+    this.load.image("piece", "src/assets/piece.png");
   }
 
   create() {
-   // stoppe les anciennes musiques
+    this.estMort = false;
+    this.gravityInverted = false;
+    this.vies = 3;
+    this.invulnerable = false;
+    this.score = 0;
+
     this.sound.stopAll();
 
-    // musique niveau 2
     this.musiqueNiveau6 = this.sound.add("musiqueNiveau6", {
       loop: true,
       volume: 0.5
     });
     this.musiqueNiveau6.play();
-    
-    const carten6 = this.add.tilemap( "carte6" );
 
-    // chargement du jeu de tuiles
-    const ts_bg6   = carten6.addTilesetImage("niveau6", "bg6");
-    const ts_t6   = carten6.addTilesetImage("alien-planet-tileset", "t6");
+    // création de la map
+    const carten6 = this.make.tilemap({ key: "carte6" });
+
+    const ts_bg6 = carten6.addTilesetImage("niveau6", "bg6");
+    const ts_t6 = carten6.addTilesetImage("alien-planet-tileset", "t6");
     const tilesets = [ts_bg6, ts_t6];
 
-    const calque_background6  = carten6.createLayer("calque_background_niveau6",  tilesets);
-    const calque_plateformes6 = carten6.createLayer("calque_platform_n6", tilesets);
+    const calque_background6 = carten6.createLayer("calque_background_niveau6", tilesets, 0, 0);
+    const calque_plateformes6 = carten6.createLayer("calque_platform_n6", tilesets, 0, 0);
 
-    // Collision sur les tuiles solides
-    calque_plateformes6.setCollisionByProperty({ estSolide: true });
     calque_plateformes6.setCollisionByProperty({ estsolide: true });
+    calque_plateformes6.setCollisionByProperty({ estSolide: true });
 
-    this.player = this.physics.add.sprite(100, 450, 'astronaut');
+    // joueur
+    this.player = this.physics.add.sprite(100, 450, "astronaut");
     this.player.setSize(50, 70);
     this.player.setOffset(36, 10);
     this.player.setCollideWorldBounds(true);
-    this.player.direction = 'droite';
+    this.player.direction = "droite";
+
+    this.spawnX = 100;
+    this.spawnY = 450;
 
     this.clavier = this.input.keyboard.createCursorKeys();
+    this.toucheGravite = this.input.keyboard.addKey("G");
+
     this.physics.add.collider(this.player, calque_plateformes6);
-    this.cameras.main.setBounds(0, 0, 3072, 768); 
+
+    // caméra
+    this.cameras.main.setBounds(0, 0, 3072, 768);
     this.cameras.main.startFollow(this.player);
-    this.physics.world.setBounds(0, 0, 3072, 768); // ← même dimensions que la caméra
+    this.physics.world.setBounds(0, 0, 3072, 768);
 
-    //animations
-    this.anims.create({
-        key: 'anim_droite',
-        frames: this.anims.generateFrameNumbers('astronaut', { start: 0, end: 3 }),
+    // texte vies
+    this.texteVies = this.add.text(20, 20, "Vies : 3", {
+      fontSize: "24px",
+      fill: "#ffffff"
+    });
+    this.texteVies.setScrollFactor(0);
+
+    // texte score
+    this.texteScore = this.add.text(20, 50, "Pièces : 0", {
+      fontSize: "24px",
+      fill: "#ffff00"
+    });
+    this.texteScore.setScrollFactor(0);
+
+    /***********************************************************************/
+    /** PIECES
+    /***********************************************************************/
+    this.groupe_pieces = this.physics.add.group();
+
+    const calque_objets = carten6.getObjectLayer("piece_a_ramasse_n6");
+
+    if (calque_objets) {
+      calque_objets.objects.forEach((point) => {
+        if (point.name === "piece") {
+          let nouvelle_piece = this.physics.add.sprite(point.x, point.y, "piece");
+          nouvelle_piece.setScale(0.5);
+          nouvelle_piece.setImmovable(false);
+          this.groupe_pieces.add(nouvelle_piece);
+        }
+      });
+    }
+
+    // les pièces collisionnent avec les plateformes
+    this.physics.add.collider(this.groupe_pieces, calque_plateformes6);
+
+    this.physics.add.overlap(this.player, this.groupe_pieces, this.ramasserPiece, null, this);
+
+    /***********************************************************************/
+    /** ANIMATIONS JOUEUR
+    /***********************************************************************/
+    if (!this.anims.exists("anim_droite")) {
+      this.anims.create({
+        key: "anim_droite",
+        frames: this.anims.generateFrameNumbers("astronaut", { start: 0, end: 3 }),
         frameRate: 10,
         repeat: -1
-    });
-    this.anims.create({
-        key: 'anim_gauche',
-        frames: this.anims.generateFrameNumbers('astronautinverse', { start: 0, end: 3 }),
+      });
+    }
+
+    if (!this.anims.exists("anim_gauche")) {
+      this.anims.create({
+        key: "anim_gauche",
+        frames: this.anims.generateFrameNumbers("astronautinverse", { start: 0, end: 3 }),
         frameRate: 10,
         repeat: -1
-    });
-    this.anims.create({
-        key: 'immobiledroit',
-        frames: [ { key: 'astronaut', frame: 21 } ],
+      });
+    }
+
+    if (!this.anims.exists("immobiledroit")) {
+      this.anims.create({
+        key: "immobiledroit",
+        frames: [{ key: "astronaut", frame: 21 }],
         frameRate: 1
-    });
-    this.anims.create({
-        key: 'immobilegauche',
-        frames: [ { key: 'astronautinverse', frame: 21 } ],
+      });
+    }
+
+    if (!this.anims.exists("immobilegauche")) {
+      this.anims.create({
+        key: "immobilegauche",
+        frames: [{ key: "astronautinverse", frame: 21 }],
         frameRate: 1
-    });
-    this.anims.create({
-        key: 'sautdroit',
-        frames: this.anims.generateFrameNumbers('astronaut', { start: 30, end: 35 }),
+      });
+    }
+
+    if (!this.anims.exists("sautdroit")) {
+      this.anims.create({
+        key: "sautdroit",
+        frames: this.anims.generateFrameNumbers("astronaut", { start: 30, end: 35 }),
         frameRate: 10
-    })
+      });
+    }
 
-    this.toucheGravite = this.input.keyboard.addKey('G');
+    /***********************************************************************/
+    /** ANIMATION ENNEMI
+    /***********************************************************************/
+    if (!this.anims.exists("anim_fishrobot")) {
+      this.anims.create({
+        key: "anim_fishrobot",
+        frames: this.anims.generateFrameNumbers("fishrobot", { start: 0, end: 2 }),
+        frameRate: 6,
+        repeat: -1
+      });
+    }
+
+    /***********************************************************************/
+    /** POISSONS
+    /***********************************************************************/
+    this.poissons = [];
+    const nbPoissons = 6;
+
+    for (let i = 0; i < nbPoissons; i++) {
+      const posX = Phaser.Math.Between(200, 2800);
+      const posY = Phaser.Math.Between(150, 600);
+
+      const poisson = this.physics.add.sprite(posX, posY, "fishrobot");
+
+      poisson.anims.play("anim_fishrobot", true);
+      poisson.setCollideWorldBounds(true);
+      poisson.body.allowGravity = false;
+      poisson.setSize(30, 40);
+      poisson.setOffset(5, 10);
+      poisson.vivant = true;
+
+      const distance = Phaser.Math.Between(200, 500);
+      const duree = Phaser.Math.Between(3000, 5000);
+      const targetX = Phaser.Math.Clamp(posX + distance, 100, 3000);
+
+      this.tweens.add({
+        targets: poisson,
+        x: targetX,
+        duration: duree,
+        yoyo: true,
+        repeat: -1
+      });
+
+      this.poissons.push(poisson);
+
+      this.physics.add.overlap(this.player, poisson, this.toucherPoisson, null, this);
+    }
+  }
+
+  ramasserPiece(player, piece) {
+    piece.destroy();
+    this.score++;
+    this.texteScore.setText("Pièces : " + this.score);
+  }
+
+  toucherPoisson(player, poisson) {
+    if (player.body.velocity.y > 0 && player.y < poisson.y) {
+      if (poisson.vivant) {
+        poisson.vivant = false;
+        poisson.destroy();
+        this.player.setVelocityY(-250);
+      }
+    } else {
+      this.perdre();
+    }
+  }
+
+  perdre() {
+    if (this.invulnerable || this.estMort) return;
+
+    this.invulnerable = true;
+    this.vies--;
+
+    this.texteVies.setText("Vies : " + this.vies);
+
+    if (this.vies <= 0) {
+      this.estMort = true;
+      this.physics.pause();
+      this.player.setTint(0xff0000);
+
+      if (this.musiqueNiveau6) {
+        this.musiqueNiveau6.stop();
+      }
+
+      this.time.delayedCall(1000, () => {
+        this.scene.restart();
+      });
+
+      return;
+    }
+
+    this.player.setPosition(this.spawnX, this.spawnY);
+    this.player.setVelocity(0, 0);
+
+    this.time.delayedCall(1000, () => {
+      this.invulnerable = false;
+    });
   }
 
   update() {
+    if (this.estMort) return;
+
     if (this.clavier.right.isDown) {
-      this.player.setVelocityX(160); 
-      this.player.direction='droite'
-      this.player.anims.play('anim_droite', true);
-    } else if (this.clavier.left.isDown) {
-      this.player.setVelocityX(-160); 
-      this.player.direction='gauche'
-      this.player.anims.play('anim_gauche', true);
-    } else{
-      this.player.setVelocityX(0); // ← action séparée
-    if (this.player.direction == 'droite') {
-        this.player.anims.play('immobiledroit', true);
-    } else {
-        this.player.anims.play('immobilegauche', true);
+      this.player.setVelocityX(160);
+      this.player.direction = "droite";
+      this.player.anims.play("anim_droite", true);
+    }
+    else if (this.clavier.left.isDown) {
+      this.player.setVelocityX(-160);
+      this.player.direction = "gauche";
+      this.player.anims.play("anim_gauche", true);
+    }
+    else {
+      this.player.setVelocityX(0);
+
+      if (this.player.direction === "droite") {
+        this.player.anims.play("immobiledroit", true);
+      } else {
+        this.player.anims.play("immobilegauche", true);
       }
     }
+
     if (this.clavier.space.isDown && this.player.body.blocked.down) {
-        this.player.setVelocityY(-400);
+      this.player.setVelocityY(-400);
     }
-    // /CHANGEMENT DE SCÈNE
-    
+
     if (Phaser.Input.Keyboard.JustDown(this.clavier.up)) {
-    if (this.musiqueNiveau4) {
-        this.musiqueNiveau4.stop();
+      if (this.musiqueNiveau6) {
+        this.musiqueNiveau6.stop();
+      }
+      this.scene.start("pageprincipale");
     }
-    this.scene.start('pageprincipale');
 
-}
-// appuie sur G pour changer la gravité 
-if (Phaser.Input.Keyboard.JustDown(this.toucheGravite)) {
-    if (this.gravityInverted == true) {
-            this.player.body.gravity.y = -600;  // gravité vers le bas
-this.gravityInverted = false;
-//    this.physics.world.gravity.y = -200; // gravité vers le haut
-    this.player.setFlipY(true); // retourne le sprite du joueur
+    if (Phaser.Input.Keyboard.JustDown(this.toucheGravite)) {
+      if (this.gravityInverted === false) {
+        this.gravityInverted = true;
+        this.player.body.gravity.y = -1200;
+        this.player.setFlipY(true);
       } else {
-      this.gravityInverted = true;
-      this.player.body.gravity.y = 0;  // gravité vers le bas
-      this.player.setFlipY(false); // remet le sprite du joueur à l'endroit
-}
-  }
+        this.gravityInverted = false;
+        this.player.body.gravity.y = 0;
+        this.player.setFlipY(false);
+      }
     }
   }
-
+}

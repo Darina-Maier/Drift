@@ -225,8 +225,8 @@ this.physics.add.overlap(this.player, this.teleporter, this.finNiveau, null, thi
     }
   }
 
-  finNiveau(player, teleporter) {
-
+  
+finNiveau(player, teleporter) {
   // optionnel : désactiver le joueur pour éviter multi déclenchement
   player.setVelocity(0);
   player.disableBody(true, true);
