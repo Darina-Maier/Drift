@@ -67,10 +67,10 @@ export default class niveau5 extends Phaser.Scene {
 
     // chargement du jeu de tuiles
     const ts_bg5 = carten5.addTilesetImage("background_n5", "bg5");
-    const ts_t5  = carten5.addTilesetImage("plateforme_n5", "t5");
+    const ts_t5 = carten5.addTilesetImage("plateforme_n5", "t5");
     const tilesets = [ts_bg5, ts_t5];
 
-    const calque_background5  = carten5.createLayer("calque_background_n5",  tilesets);
+    const calque_background5 = carten5.createLayer("calque_background_n5", tilesets);
     const calque_plateformes5 = carten5.createLayer("calque_plateformes_n5", tilesets);
 
     // Collision sur les tuiles solides
@@ -141,10 +141,10 @@ export default class niveau5 extends Phaser.Scene {
     });
 
     // affectation de la touche A au tir
-    boutonFeu    = this.input.keyboard.addKey('A');
+    boutonFeu = this.input.keyboard.addKey('A');
     // création du groupe des balles
     groupeBullets = this.physics.add.group();
-    this.isTir   = false;
+    this.isTir = false;
 
     this.physics.world.on("worldbounds", function (body) {
       const objet = body.gameObject;
@@ -154,12 +154,12 @@ export default class niveau5 extends Phaser.Scene {
     });
 
     // collision entre les balles et les météorites
-    this.physics.add.overlap(groupeBullets, this.groupeMeteorites, this.hitMeteorite,   null, this);
+    this.physics.add.overlap(groupeBullets, this.groupeMeteorites, this.hitMeteorite, null, this);
     // contact joueur meteorite
-    this.physics.add.overlap(this.player,   this.groupeMeteorites, this.toucheMeteorite, null, this);
+    this.physics.add.overlap(this.player, this.groupeMeteorites, this.toucheMeteorite, null, this);
 
     this.gravityInverted = false;
-    this.toucheGravite   = this.input.keyboard.addKey('G');
+    this.toucheGravite = this.input.keyboard.addKey('G');
 
     // animation du téléporteur avec les 9 images
     this.anims.create({
@@ -215,16 +215,16 @@ export default class niveau5 extends Phaser.Scene {
     }).setScrollFactor(0).setDepth(10).setVisible(false);
 
     // Flags
-    this.niveauComplete   = false;
-    this.finNiveauAppele  = false;
-    this.vies             = 3;
+    this.niveauComplete = false;
+    this.finNiveauAppele = false;
+    this.vies = 3;
 
     // Journal de bord
     this.time.delayedCall(300, () => {
       this.afficherJournalDeBord({
         planete: 'MEYER',
         gravite: '0.6 g',
-        note:    "Pluie de météorites constante. Mon pistolet est mon meilleur ami ici. Attention à la gravité... elle peut s'inverser.",
+        note: "Pluie de météorites constante. Mon pistolet est mon meilleur ami ici. Attention à la gravité... elle peut s'inverser.",
         touches: ['← →', 'ESPACE', 'A  tirer', 'G  gravité']
       });
     });
@@ -294,7 +294,7 @@ export default class niveau5 extends Phaser.Scene {
   /*********************************************************************/
   creerMeteorite() {
     const frameAleatoire = Phaser.Math.Between(0, 3);
-    let   xAleatoire     = Phaser.Math.Between(this.player.x - 300, this.player.x + 300);
+    let xAleatoire = Phaser.Math.Between(this.player.x - 300, this.player.x + 300);
     xAleatoire = Phaser.Math.Clamp(xAleatoire, 50, 3000);
 
     const meteorite = this.groupeMeteorites.create(xAleatoire, this.player.y - 400, 'meteorites', frameAleatoire);
@@ -343,7 +343,7 @@ export default class niveau5 extends Phaser.Scene {
     const coefDir = player.direction === 'gauche' ? -1 : 1;
 
     // création de la balle à côté du joueur
-    const bullet  = groupeBullets.create(player.x + (25 * coefDir), player.y - 4, 'bullet');
+    const bullet = groupeBullets.create(player.x + (25 * coefDir), player.y - 4, 'bullet');
 
     bullet.setScale(0.5);
     bullet.setSize(50, 50);
@@ -424,16 +424,14 @@ export default class niveau5 extends Phaser.Scene {
   }
 
   afficherJournalDeBord(config) {
-    const DEPTH   = 50;
-    const TAG     = '__journal__';
-    const x       = 16;
-    const y       = 16;
+    const DEPTH = 50;
+    const TAG = '__journal__';
+    const x = 16;
+    const y = 16;
     const largeur = 320;
     const hauteur = 230;
-    const pad     = 18;
+    const pad = 18;
 
-    // Bloque les inputs pendant l'affichage
-    this.input.keyboard.enabled = false;
 
     // Fond vitré
     const fond = this.add.graphics();
@@ -451,13 +449,17 @@ export default class niveau5 extends Phaser.Scene {
     reflet.setScrollFactor(0).setDepth(DEPTH);
     reflet[TAG] = true;
 
-    const sLabel  = { fontFamily:'Orbitron', fontSize:'10px',  color:'#66bbff', letterSpacing:2 };
-    const sTitre  = { fontFamily:'Orbitron', fontSize:'17px', color:'#ddf0ff' };
-    const sVal    = { fontFamily:'Orbitron', fontSize:'13px', color:'#aaddff' };
-    const sNote   = { fontFamily:'Orbitron', fontSize:'11px',  color:'#b0d8f5',
-                      fontStyle:'italic', wordWrap:{ width: largeur - pad * 2 } };
-    const sTouche = { fontFamily:'Orbitron', fontSize:'11px',  color:'#aaddff',
-                      backgroundColor:'#0d2a40', padding:{ x:5, y:2 } };
+    const sLabel = { fontFamily: 'Orbitron', fontSize: '10px', color: '#66bbff', letterSpacing: 2 };
+    const sTitre = { fontFamily: 'Orbitron', fontSize: '17px', color: '#ddf0ff' };
+    const sVal = { fontFamily: 'Orbitron', fontSize: '13px', color: '#aaddff' };
+    const sNote = {
+      fontFamily: 'Orbitron', fontSize: '11px', color: '#b0d8f5',
+      fontStyle: 'italic', wordWrap: { width: largeur - pad * 2 }
+    };
+    const sTouche = {
+      fontFamily: 'Orbitron', fontSize: '11px', color: '#aaddff',
+      backgroundColor: '#0d2a40', padding: { x: 5, y: 2 }
+    };
 
     const txt = (tx, ty, msg, style) =>
       this.add.text(tx, ty, msg, style)
@@ -465,11 +467,11 @@ export default class niveau5 extends Phaser.Scene {
         .setData(TAG, true);
 
     // En-tête
-    txt(x + pad,       y + pad, '— JOURNAL DE BORD —', sLabel);
+    txt(x + pad, y + pad, '— JOURNAL DE BORD —', sLabel);
 
     // Planète + Gravité
-    txt(x + pad,       y + 40, 'PLANÈTE', sLabel);
-    txt(x + pad,       y + 51, config.planete, sTitre);
+    txt(x + pad, y + 40, 'PLANÈTE', sLabel);
+    txt(x + pad, y + 51, config.planete, sTitre);
     txt(x + pad + 170, y + 40, 'GRAVITÉ', sLabel);
     txt(x + pad + 170, y + 51, config.gravite, sVal);
 
@@ -516,7 +518,6 @@ export default class niveau5 extends Phaser.Scene {
         duration: 700,
         onComplete: () => {
           elements.forEach(c => c.destroy());
-          this.input.keyboard.enabled = true;
           this.textePieces.setVisible(true);
         }
       });

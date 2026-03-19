@@ -293,8 +293,7 @@ afficherJournalDeBord(config) {
     const hauteur = 260;
     const pad     = 18;
 
-    // Bloque les inputs pendant l'affichage
-    this.input.keyboard.enabled = false;
+    
 
     // Fond vitré — ambiance rouge/feu
     const fond = this.add.graphics();
@@ -377,7 +376,6 @@ afficherJournalDeBord(config) {
             duration: 700,
             onComplete: () => {
                 elements.forEach(c => c.destroy());
-                this.input.keyboard.enabled = true;
                 this.textePieces.setVisible(true);
             }
         });
