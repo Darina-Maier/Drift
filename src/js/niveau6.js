@@ -39,6 +39,17 @@ export default class niveau6 extends Phaser.Scene {
 
     // pièce
     this.load.image("piece", "src/assets/piece.png");
+
+    // chargement des 9 images du téléporteur
+    this.load.image('tp01', 'src/assets/teleporter/tp01.png');
+    this.load.image('tp02', 'src/assets/teleporter/tp02.png');
+    this.load.image('tp03', 'src/assets/teleporter/tp03.png');
+    this.load.image('tp04', 'src/assets/teleporter/tp04.png');
+    this.load.image('tp05', 'src/assets/teleporter/tp05.png');
+    this.load.image('tp06', 'src/assets/teleporter/tp06.png');
+    this.load.image('tp07', 'src/assets/teleporter/tp07.png');
+    this.load.image('tp08', 'src/assets/teleporter/tp08.png');
+    this.load.image('tp09', 'src/assets/teleporter/tp09.png');
   }
 
   create() {
@@ -218,12 +229,53 @@ export default class niveau6 extends Phaser.Scene {
 
       this.physics.add.overlap(this.player, poisson, this.toucherPoisson, null, this);
     }
+
+    /***********************************************************************/
+    /** TELEPORTEUR
+    /***********************************************************************/
+    // animation du téléporteur avec les 9 images
+    if (!this.anims.exists('anim_teleporter')) {
+      this.anims.create({
+        key: 'anim_teleporter',
+        frames: [
+          { key: 'tp01' },
+          { key: 'tp02' },
+          { key: 'tp03' },
+          { key: 'tp04' },
+          { key: 'tp05' },
+          { key: 'tp06' },
+          { key: 'tp07' },
+          { key: 'tp08' },
+          { key: 'tp09' }
+        ],
+        frameRate: 10,
+        repeat: -1
+      });
+    }
+
+    // création du téléporteur à la fin du niveau
+    this.teleporter = this.physics.add.sprite(3020, 380, 'tp01');
+    this.teleporter.body.allowGravity = false;
+    this.teleporter.setImmovable(true);
+    this.teleporter.anims.play('anim_teleporter');
+    this.teleporter.setScale(0.3);
+    this.teleporter.setSize(150, 200);
+
+    this.physics.add.overlap(this.player, this.teleporter, this.finNiveau, null, this);
   }
 
   ramasserPiece(player, piece) {
     piece.destroy();
     this.score++;
     this.texteScore.setText("Pièces : " + this.score);
+  }
+
+  finNiveau(player, teleporter) {
+    // Arrête la musique et redémarre la scène principale
+    if (this.musiqueNiveau6) {
+      this.musiqueNiveau6.stop();
+    }
+    this.scene.start('pageprincipale');
   }
 
   toucherPoisson(player, poisson) {
