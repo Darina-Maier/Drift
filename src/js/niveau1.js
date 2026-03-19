@@ -12,6 +12,7 @@ export default class niveau1 extends Phaser.Scene {
   }
 
   preload() {
+    this.load.spritesheet('astronaut', 'src/assets/astronaut.png', { frameWidth: 130, frameHeight: 90 });
     this.load.image("bg", "src/assets/tuilesn1/1/1_game_background.png");
     this.load.image("plat1", "src/assets/tuilesn1/plateform1.png");
     this.load.image("plat2", "src/assets/tuilesn1/platform2.png");
@@ -66,7 +67,7 @@ export default class niveau1 extends Phaser.Scene {
     // Collision death — tue le joueur
     calque_death.setCollisionByProperty({ estSolide: true });
 
-    this.player = this.physics.add.sprite(120, 'astronaut');
+    this.player = this.physics.add.sprite(2950,450, 'astronaut');
     this.player.setSize(50, 70);
     this.player.setOffset(36, 10);
     this.player.setCollideWorldBounds(true);

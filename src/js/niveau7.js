@@ -533,7 +533,7 @@ export default class niveau7 extends Phaser.Scene {
 
   ramasserPiece(player, piece) {
     piece.disableBody(true, true);
-  finNiveau(player, teleporter) {
+  finNiveau(player, teleporter); {
     // Empêcher les appels multiples
     if (this.finNiveauAppele) return;
     this.finNiveauAppele = true;
@@ -544,7 +544,7 @@ export default class niveau7 extends Phaser.Scene {
     }
   }
 
-  finNiveau(player, teleporter) {
+  finNiveau(player, teleporter); {
     player.setVelocity(0);
     player.disableBody(true, true);
 
