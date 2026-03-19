@@ -239,7 +239,7 @@ export default class pageprincipale extends Phaser.Scene {
 
     }
 
-    
+
 
     update() {
         // Mise à jour compteur
@@ -326,6 +326,21 @@ export default class pageprincipale extends Phaser.Scene {
         if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('T'))) {
             this.game.registry.set('niveauxFinis', ['niveau1', 'niveau2', 'niveau3', 'niveau4', 'niveau5', 'niveau6', 'niveau7']);
         }
+
+        const toutesLesPlanetes = [p1, p2, p3, p4, p5, p6, p7, p8];
+        let surUnePlanete = false;
+
+        toutesLesPlanetes.forEach(planete => {
+            if (this.physics.overlap(player, planete)) {
+                surUnePlanete = true;
+                this.stickeurE.setPosition(planete.x +50, planete.y - 150);
+                this.stickeurE.setVisible(true);
+            }
+        });
+
+        if (!surUnePlanete) {
+            this.stickeurE.setVisible(false);
+        }
+
     }
 }
-
