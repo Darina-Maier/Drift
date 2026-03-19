@@ -399,7 +399,7 @@ export default class niveau2 extends Phaser.Scene {
     const sTitre = { fontFamily: 'Orbitron', fontSize: '17px', color: '#ffe0aa' };
     const sVal = { fontFamily: 'Orbitron', fontSize: '13px', color: '#ffbb77' };
     const sNote = {
-      fontFamily: 'Orbitron', fontSize: '11px', color: '#ffd0aa',
+      fontFamily: 'Orbitron', fontSize: '12px', color: '#ffd0aa',
       fontStyle: 'italic', wordWrap: { width: largeur - pad * 2 }
     };
     const sTouche = {

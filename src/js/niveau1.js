@@ -314,7 +314,7 @@ afficherJournalDeBord(config) {
     const sLabel  = { fontFamily:'Orbitron', fontSize:'10px', color:'#ff6633', letterSpacing:2 };
     const sTitre  = { fontFamily:'Orbitron', fontSize:'17px', color:'#ffccaa' };
     const sVal    = { fontFamily:'Orbitron', fontSize:'13px', color:'#ffaa77' };
-    const sNote   = { fontFamily:'Orbitron', fontSize:'11px', color:'#ffbb99',
+    const sNote   = { fontFamily:'Orbitron', fontSize:'12px', color:'#ffbb99',
                       fontStyle:'italic', wordWrap:{ width: largeur - pad * 2 } };
     const sTouche = { fontFamily:'Orbitron', fontSize:'11px', color:'#ffaa77',
                       backgroundColor:'#3a1200', padding:{ x:5, y:2 } };

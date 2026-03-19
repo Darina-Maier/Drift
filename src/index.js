@@ -41,4 +41,4 @@ game.events.once('ready', () => {
     game.soundOn = true;
 });
 
-game.scene.start("pageprincipale"); // démarre la scène pageprincipale
+game.scene.start("niveau7"); // démarre la scène niveau1

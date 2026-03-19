@@ -1,4 +1,3 @@
-
 /***********************************************************************/
 /** VARIABLES GLOBALES 
 /***********************************************************************/
@@ -13,7 +12,6 @@ export default class niveau3 extends Phaser.Scene {
       key: "niveau3" //  ici on précise le nom de la classe en tant qu'identifiant
     });
   }
-
 
   preload() {
     this.load.audio("musiqueNiveau3", "src/assets/sons/niveau3.ogg");
@@ -34,7 +32,6 @@ export default class niveau3 extends Phaser.Scene {
     this.load.image('tp08', 'src/assets/teleporter/tp08.png');
     this.load.image('tp09', 'src/assets/teleporter/tp09.png');
 
-
     this.load.spritesheet('astronaut', 'src/assets/astronaut.png', {
       frameWidth: 130,
       frameHeight: 90
@@ -50,7 +47,6 @@ export default class niveau3 extends Phaser.Scene {
     });
 
     this.load.image('piece3', 'src/assets/elemn3/en31.png');
-
   }
 
   create() {
@@ -62,7 +58,6 @@ export default class niveau3 extends Phaser.Scene {
       loop: true,
       volume: 0.5
     });
-
     this.musiqueNiveau3.play();
 
     const carten3 = this.add.tilemap("carte");
@@ -76,7 +71,6 @@ export default class niveau3 extends Phaser.Scene {
     const calque_plateformes = carten3.createLayer("calque_plateform_alien", tilesets);
 
     // Collision sur les tuiles solides
-
     calque_plateformes.setCollisionByProperty({ estsolide: true });
 
     // création du joueur
@@ -85,7 +79,6 @@ export default class niveau3 extends Phaser.Scene {
     this.player.setOffset(36, 10);
     this.player.setCollideWorldBounds(true);
     this.player.direction = 'droite';
-
 
     // Animation ennemi3
     this.anims.create({
@@ -99,7 +92,6 @@ export default class niveau3 extends Phaser.Scene {
     this.groupe_ennemis = this.physics.add.group();
     // création pièces
     this.groupe_pieces = this.physics.add.staticGroup();
-
 
     // Récupère le calque objet
     const calque_objets = carten3.getObjectLayer('calque_objet3');
@@ -116,7 +108,6 @@ export default class niveau3 extends Phaser.Scene {
     // Ennemis qui marchent
     calque_objets.objects.forEach(point => {
       if (point.name == 'ennemi3') {
-
         var ennemi = this.physics.add.sprite(point.x, point.y, 'ennemi3');
         ennemi.setScale(0.4);
         ennemi.setSize(70, 55);
@@ -144,8 +135,7 @@ export default class niveau3 extends Phaser.Scene {
       fontFamily: 'Orbitron',
       backgroundColor: '#000000',
       padding: { x: 8, y: 4 }
-    }).setScrollFactor(0).setDepth(10);
-
+    }).setScrollFactor(0).setDepth(10).setVisible(false);
 
     // Si joueur touche ennemi → restart
     this.physics.add.overlap(this.player, this.groupe_ennemis, () => {
@@ -171,15 +161,9 @@ export default class niveau3 extends Phaser.Scene {
     this.anims.create({
       key: 'anim_teleporter',
       frames: [
-        { key: 'tp01' },
-        { key: 'tp02' },
-        { key: 'tp03' },
-        { key: 'tp04' },
-        { key: 'tp05' },
-        { key: 'tp06' },
-        { key: 'tp07' },
-        { key: 'tp08' },
-        { key: 'tp09' }
+        { key: 'tp01' }, { key: 'tp02' }, { key: 'tp03' },
+        { key: 'tp04' }, { key: 'tp05' }, { key: 'tp06' },
+        { key: 'tp07' }, { key: 'tp08' }, { key: 'tp09' }
       ],
       frameRate: 10, // vitesse de rotation
       repeat: -1     // boucle infinie
@@ -190,14 +174,22 @@ export default class niveau3 extends Phaser.Scene {
     this.teleporter.body.allowGravity = false;
     this.teleporter.setImmovable(true);
 
-    // animation en boucle 
+    // animation en boucle
     this.teleporter.anims.play('anim_teleporter');
     this.teleporter.setScale(0.3);
     this.teleporter.setSize(90, 200);
     this.physics.add.overlap(this.player, this.teleporter, this.finNiveau, null, this);
 
+    // Journal de bord
+    this.time.delayedCall(300, () => {
+      this.afficherJournalDeBord({
+        planete: 'DURAND',
+        gravite: '0.9 g',
+        note:    "Des vapeurs bleutées partout. La gravité tourne dans tous les sens ici... je dois rester concentré pour ne pas perdre le nord.",
+        touches: ['← →  déplacer\nC  courir\nESPACE  sauter\nG  rotation gravité']
+      });
+    });
   }
-
 
   update() {
     const piecesRestantes = this.groupe_pieces.countActive();
@@ -286,7 +278,6 @@ export default class niveau3 extends Phaser.Scene {
       }
     }
 
-
     // ENNEMIS — sautent selon gravité
     this.groupe_ennemis.children.iterate((ennemi) => {
       this.orienterSprite(ennemi);
@@ -313,8 +304,6 @@ export default class niveau3 extends Phaser.Scene {
       }
     });
   }
-
-
 
   orienterSprite(obj) {
     if (this.graviteDirection == 'bas') {
@@ -351,10 +340,124 @@ export default class niveau3 extends Phaser.Scene {
     });
   }
 
+  ecrireLetterByLetter(texteObj, message, vitesse = 40, onComplete = null) {
+    if (!message) return;
+    texteObj.setText('');
+    let i = 0;
+
+    if (this.timerEcriture) {
+      this.timerEcriture.remove();
+    }
+
+    this.timerEcriture = this.time.addEvent({
+      delay: vitesse,
+      repeat: message.length - 1,
+      callback: () => {
+        texteObj.setText(texteObj.text + message[i]);
+        i++;
+        if (i >= message.length && onComplete) {
+          onComplete();
+        }
+      }
+    });
+  }
+
+  afficherJournalDeBord(config) {
+    const DEPTH   = 50;
+    const TAG     = '__journal__';
+    const x       = 16;
+    const y       = 16;
+    const largeur = 320;
+    const hauteur = 280;
+    const pad     = 18;
+
+    // Fond vitré — ambiance bleu-vert givré
+    const fond = this.add.graphics();
+    fond.fillStyle(0x0a2a2e, 0.85);
+    fond.fillRoundedRect(x, y, largeur, hauteur, 12);
+    fond.lineStyle(1, 0x66ddcc, 0.6);
+    fond.strokeRoundedRect(x, y, largeur, hauteur, 12);
+    fond.setScrollFactor(0).setDepth(DEPTH);
+    fond[TAG] = true;
+
+    // Reflet haut
+    const reflet = this.add.graphics();
+    reflet.fillStyle(0x88cccc, 0.08);
+    reflet.fillRoundedRect(x + 4, y + 4, largeur - 8, 38, 8);
+    reflet.setScrollFactor(0).setDepth(DEPTH);
+    reflet[TAG] = true;
+
+    const sLabel  = { fontFamily: 'Orbitron', fontSize: '10px', color: '#66ddcc', letterSpacing: 2 };
+    const sTitre  = { fontFamily: 'Orbitron', fontSize: '17px', color: '#cceee8' };
+    const sVal    = { fontFamily: 'Orbitron', fontSize: '13px', color: '#99ddcc' };
+    const sNote   = {
+      fontFamily: 'Orbitron', fontSize: '12px', color: '#aae8dd',
+      fontStyle: 'italic', wordWrap: { width: largeur - pad * 2 }
+    };
+    const sTouche = {
+      fontFamily: 'Orbitron', fontSize: '11px', color: '#99ddcc',
+      backgroundColor: '#0a2a2e', padding: { x: 5, y: 2 }
+    };
+
+    const txt = (tx, ty, msg, style) =>
+      this.add.text(tx, ty, msg, style)
+        .setScrollFactor(0).setDepth(DEPTH)
+        .setData(TAG, true);
+
+    // En-tête
+    txt(x + pad, y + pad, '— JOURNAL DE BORD —', sLabel);
+
+    // Planète + Gravité
+    txt(x + pad,       y + 40, 'PLANÈTE', sLabel);
+    txt(x + pad,       y + 51, config.planete, sTitre);
+    txt(x + pad + 170, y + 40, 'GRAVITÉ', sLabel);
+    txt(x + pad + 170, y + 51, config.gravite, sVal);
+
+    // Séparateur 1
+    const sep1 = this.add.graphics();
+    sep1.lineStyle(1, 0x66ddcc, 0.3);
+    sep1.lineBetween(x + pad, y + 73, x + largeur - pad, y + 73);
+    sep1.setScrollFactor(0).setDepth(DEPTH);
+    sep1[TAG] = true;
+
+    // Note personnage (machine à écrire)
+    const texteNote = this.add.text(x + pad, y + 80, '', sNote)
+      .setScrollFactor(0).setDepth(DEPTH)
+      .setData(TAG, true);
+    this.ecrireLetterByLetter(texteNote, `"${config.note}"`, 30);
+
+    // Séparateur 2
+    const sep2 = this.add.graphics();
+    sep2.lineStyle(1, 0x66ddcc, 0.3);
+    sep2.lineBetween(x + pad, y + 165, x + largeur - pad, y + 165);
+    sep2.setScrollFactor(0).setDepth(DEPTH);
+    sep2[TAG] = true;
+
+    // Contrôles
+    txt(x + pad, y + 173, 'CONTRÔLES', sLabel);
+    txt(x + pad, y + 187, config.touches[0], sTouche);
+
+    // Collecte tous les éléments du journal
+    const elements = this.children.list.filter(c =>
+      c[TAG] === true || c.getData?.(TAG) === true
+    );
+
+    // Disparition après 10s
+    this.time.delayedCall(10000, () => {
+      this.tweens.add({
+        targets: elements,
+        alpha: 0,
+        duration: 700,
+        onComplete: () => {
+          elements.forEach(c => c.destroy());
+          this.textePieces.setVisible(true);
+        }
+      });
+    });
+  }
 }
 
 function ramasserPiece(player, piece) {
   piece.disableBody(true, true);
   // Ici tu peux ajouter du code pour augmenter le score ou autre
 }
-

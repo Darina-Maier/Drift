@@ -182,10 +182,20 @@ export default class niveau6 extends Phaser.Scene {
       fontFamily: 'Orbitron',
       backgroundColor: '#000000',
       padding: { x: 8, y: 4 }
-    }).setScrollFactor(0).setDepth(10);
+    }).setScrollFactor(0).setDepth(10).setVisible(false);
 
     // flag niveau complet
     this.niveauComplete = false;
+
+    // Journal de bord
+    this.time.delayedCall(300, () => {
+      this.afficherJournalDeBord({
+        planete: 'ALONZO',
+        gravite: '0.7 g',
+        note:    "Tout est immergé ici. Des créatures mécaniques nagent en liberté et n'ont pas l'air de m'apprécier. Je peux sauter sur elles... mais gare à ne pas me faire toucher.",
+        touches: ['← →  déplacer\nESPACE  sauter\nG  gravité\nSauter sur les poissons !']
+      });
+    });
   }
 
   update() {
@@ -249,11 +259,10 @@ export default class niveau6 extends Phaser.Scene {
       if (this.gravityInverted == true) {
         this.player.body.gravity.y = -600;  // gravité vers le bas
         this.gravityInverted = false;
-        // this.physics.world.gravity.y = -200; // gravité vers le haut
         this.player.setFlipY(true); // retourne le sprite du joueur
       } else {
         this.gravityInverted = true;
-        this.player.body.gravity.y = 0;  // gravité vers le bas
+        this.player.body.gravity.y = 0;  // gravité vers le haut
         this.player.setFlipY(false); // remet le sprite du joueur à l'endroit
       }
     }
@@ -263,7 +272,6 @@ export default class niveau6 extends Phaser.Scene {
     for (let i = 0; i < 6; i++) {
       let xAleatoire = Phaser.Math.Between(200, 2800);
       let yAleatoire = Phaser.Math.Between(100, 600);
-
       this.creerPoisson(xAleatoire, yAleatoire);
     }
   }
@@ -282,7 +290,6 @@ export default class niveau6 extends Phaser.Scene {
     }
     poisson.setVelocityX(60 * poisson.direction);
     poisson.HP = 1;
-
     this.poissons.push(poisson);
   }
 
@@ -334,5 +341,121 @@ export default class niveau6 extends Phaser.Scene {
     if (this.groupe_pieces.countActive() === 0) {
       this.niveauComplete = true;
     }
+  }
+
+  ecrireLetterByLetter(texteObj, message, vitesse = 40, onComplete = null) {
+    if (!message) return;
+    texteObj.setText('');
+    let i = 0;
+
+    if (this.timerEcriture) {
+      this.timerEcriture.remove();
+    }
+
+    this.timerEcriture = this.time.addEvent({
+      delay: vitesse,
+      repeat: message.length - 1,
+      callback: () => {
+        texteObj.setText(texteObj.text + message[i]);
+        i++;
+        if (i >= message.length && onComplete) {
+          onComplete();
+        }
+      }
+    });
+  }
+
+  afficherJournalDeBord(config) {
+    const DEPTH   = 50;
+    const TAG     = '__journal__';
+    const x       = 16;
+    const y       = 16;
+    const largeur = 320;
+    const hauteur = 280;
+    const pad     = 18;
+
+    // Fond vitré — ambiance turquoise
+    const fond = this.add.graphics();
+    fond.fillStyle(0x0a2a30, 0.85);
+    fond.fillRoundedRect(x, y, largeur, hauteur, 12);
+    fond.lineStyle(1, 0x00ffdd, 0.6);
+    fond.strokeRoundedRect(x, y, largeur, hauteur, 12);
+    fond.setScrollFactor(0).setDepth(DEPTH);
+    fond[TAG] = true;
+
+    // Reflet haut
+    const reflet = this.add.graphics();
+    reflet.fillStyle(0x00ddcc, 0.10);
+    reflet.fillRoundedRect(x + 4, y + 4, largeur - 8, 38, 8);
+    reflet.setScrollFactor(0).setDepth(DEPTH);
+    reflet[TAG] = true;
+
+    const sLabel  = { fontFamily: 'Orbitron', fontSize: '10px', color: '#00ffdd', letterSpacing: 2 };
+    const sTitre  = { fontFamily: 'Orbitron', fontSize: '17px', color: '#ccffee' };
+    const sVal    = { fontFamily: 'Orbitron', fontSize: '13px', color: '#66ffdd' };
+    const sNote   = {
+      fontFamily: 'Orbitron', fontSize: '12px', color: '#99ffee',
+      fontStyle: 'italic', wordWrap: { width: largeur - pad * 2 }
+    };
+    const sTouche = {
+      fontFamily: 'Orbitron', fontSize: '11px', color: '#66ffdd',
+      backgroundColor: '#0a2a30', padding: { x: 5, y: 2 }
+    };
+
+    const txt = (tx, ty, msg, style) =>
+      this.add.text(tx, ty, msg, style)
+        .setScrollFactor(0).setDepth(DEPTH)
+        .setData(TAG, true);
+
+    // En-tête
+    txt(x + pad, y + pad, '— JOURNAL DE BORD —', sLabel);
+
+    // Planète + Gravité
+    txt(x + pad,       y + 40, 'PLANÈTE', sLabel);
+    txt(x + pad,       y + 51, config.planete, sTitre);
+    txt(x + pad + 170, y + 40, 'GRAVITÉ', sLabel);
+    txt(x + pad + 170, y + 51, config.gravite, sVal);
+
+    // Séparateur 1
+    const sep1 = this.add.graphics();
+    sep1.lineStyle(1, 0x00ffdd, 0.3);
+    sep1.lineBetween(x + pad, y + 73, x + largeur - pad, y + 73);
+    sep1.setScrollFactor(0).setDepth(DEPTH);
+    sep1[TAG] = true;
+
+    // Note personnage (machine à écrire)
+    const texteNote = this.add.text(x + pad, y + 80, '', sNote)
+      .setScrollFactor(0).setDepth(DEPTH)
+      .setData(TAG, true);
+    this.ecrireLetterByLetter(texteNote, `"${config.note}"`, 30);
+
+    // Séparateur 2
+    const sep2 = this.add.graphics();
+    sep2.lineStyle(1, 0x00ffdd, 0.3);
+    sep2.lineBetween(x + pad, y + 165, x + largeur - pad, y + 165);
+    sep2.setScrollFactor(0).setDepth(DEPTH);
+    sep2[TAG] = true;
+
+    // Contrôles
+    txt(x + pad, y + 173, 'CONTRÔLES', sLabel);
+    txt(x + pad, y + 187, config.touches[0], sTouche);
+
+    // Collecte tous les éléments du journal
+    const elements = this.children.list.filter(c =>
+      c[TAG] === true || c.getData?.(TAG) === true
+    );
+
+    // Disparition après 10s
+    this.time.delayedCall(10000, () => {
+      this.tweens.add({
+        targets: elements,
+        alpha: 0,
+        duration: 700,
+        onComplete: () => {
+          elements.forEach(c => c.destroy());
+          this.textePieces.setVisible(true);
+        }
+      });
+    });
   }
 }
