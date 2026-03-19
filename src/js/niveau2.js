@@ -152,7 +152,7 @@ export default class niveau2 extends Phaser.Scene {
       this.scene.restart();
     });
 
-    // Collisions avec les plateformes et les zones de mort
+    /// affichage du nombre de pièces restantes
     this.totalPieces = this.groupe_pieces.getChildren().length;
     this.textePieces = this.add.text(16, 16, '', {
       fontSize: '20px',
@@ -162,6 +162,7 @@ export default class niveau2 extends Phaser.Scene {
       padding: { x: 8, y: 4 }
     }).setScrollFactor(0).setDepth(10);
 
+    // flag niveau complet
     this.niveauComplete = false;
 
     //COLLIDERS
