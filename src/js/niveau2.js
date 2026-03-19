@@ -160,7 +160,17 @@ export default class niveau2 extends Phaser.Scene {
       fontFamily: 'Orbitron',
       backgroundColor: '#000000',
       padding: { x: 8, y: 4 }
-    }).setScrollFactor(0).setDepth(10);
+    }).setScrollFactor(0).setDepth(10).setVisible(false);
+
+    // Journal de bord
+    this.time.delayedCall(300, () => {
+      this.afficherJournalDeBord({
+        planete: 'FRAGALE',
+        gravite: '1.2 g',
+        note: "Atmosphère dense et chaude. Mes jambes sont lourdes ici, la gravité m'écrase un peu. Et ces créatures... elles patrouillent sans relâche.",
+        touches: ['← → : déplacer    C : courir    ESPACE : sauter  \nG : gravité']
+      });
+    });
 
     // flag niveau complet
     this.niveauComplete = false;
@@ -335,5 +345,123 @@ export default class niveau2 extends Phaser.Scene {
     if (this.groupe_pieces.countActive() === 0) {
       this.niveauComplete = true;
     }
+  }
+
+  ecrireLetterByLetter(texteObj, message, vitesse = 40, onComplete = null) {
+    if (!message) return;
+    texteObj.setText('');
+    let i = 0;
+
+    if (this.timerEcriture) {
+      this.timerEcriture.remove();
+    }
+
+    this.timerEcriture = this.time.addEvent({
+      delay: vitesse,
+      repeat: message.length - 1,
+      callback: () => {
+        texteObj.setText(texteObj.text + message[i]);
+        i++;
+        if (i >= message.length && onComplete) {
+          onComplete();
+        }
+      }
+    });
+  }
+
+  afficherJournalDeBord(config) {
+    const DEPTH = 50;
+    const TAG = '__journal__';
+    const x = 16;
+    const y = 16;
+    const largeur = 320;
+    const hauteur = 260;
+    const pad = 18;
+
+
+    // Fond vitré — ambiance orange
+    const fond = this.add.graphics();
+    fond.fillStyle(0x2e1500, 0.85);
+    fond.fillRoundedRect(x, y, largeur, hauteur, 12);
+    fond.lineStyle(1, 0xff9933, 0.6);
+    fond.strokeRoundedRect(x, y, largeur, hauteur, 12);
+    fond.setScrollFactor(0).setDepth(DEPTH);
+    fond[TAG] = true;
+
+    // Reflet haut
+    const reflet = this.add.graphics();
+    reflet.fillStyle(0xff7700, 0.10);
+    reflet.fillRoundedRect(x + 4, y + 4, largeur - 8, 38, 8);
+    reflet.setScrollFactor(0).setDepth(DEPTH);
+    reflet[TAG] = true;
+
+    const sLabel = { fontFamily: 'Orbitron', fontSize: '10px', color: '#ff9933', letterSpacing: 2 };
+    const sTitre = { fontFamily: 'Orbitron', fontSize: '17px', color: '#ffe0aa' };
+    const sVal = { fontFamily: 'Orbitron', fontSize: '13px', color: '#ffbb77' };
+    const sNote = {
+      fontFamily: 'Orbitron', fontSize: '11px', color: '#ffd0aa',
+      fontStyle: 'italic', wordWrap: { width: largeur - pad * 2 }
+    };
+    const sTouche = {
+      fontFamily: 'Orbitron', fontSize: '11px', color: '#ffbb77',
+      backgroundColor: '#3a1e00', padding: { x: 5, y: 2 }
+    };
+
+    const txt = (tx, ty, msg, style) =>
+      this.add.text(tx, ty, msg, style)
+        .setScrollFactor(0).setDepth(DEPTH)
+        .setData(TAG, true);
+
+    // En-tête
+    txt(x + pad, y + pad, '— JOURNAL DE BORD —', sLabel);
+
+    // Planète + Gravité
+    txt(x + pad, y + 40, 'PLANÈTE', sLabel);
+    txt(x + pad, y + 51, config.planete, sTitre);
+    txt(x + pad + 170, y + 40, 'GRAVITÉ', sLabel);
+    txt(x + pad + 170, y + 51, config.gravite, sVal);
+
+    // Séparateur 1
+    const sep1 = this.add.graphics();
+    sep1.lineStyle(1, 0xff9933, 0.3);
+    sep1.lineBetween(x + pad, y + 73, x + largeur - pad, y + 73);
+    sep1.setScrollFactor(0).setDepth(DEPTH);
+    sep1[TAG] = true;
+
+    // Note personnage (machine à écrire)
+    const texteNote = this.add.text(x + pad, y + 80, '', sNote)
+      .setScrollFactor(0).setDepth(DEPTH)
+      .setData(TAG, true);
+    this.ecrireLetterByLetter(texteNote, `"${config.note}"`, 30);
+
+    // Séparateur 2
+    const sep2 = this.add.graphics();
+    sep2.lineStyle(1, 0xff9933, 0.3);
+    sep2.lineBetween(x + pad, y + 165, x + largeur - pad, y + 165);
+    sep2.setScrollFactor(0).setDepth(DEPTH);
+    sep2[TAG] = true;
+
+    // Contrôles
+    // Contrôles
+    txt(x + pad, y + 173, 'CONTRÔLES', sLabel);
+    txt(x + pad, y + 187, config.touches[0], sTouche);
+
+    // Collecte tous les éléments du journal
+    const elements = this.children.list.filter(c =>
+      c[TAG] === true || c.getData?.(TAG) === true
+    );
+
+    // Disparition après 10s
+    this.time.delayedCall(10000, () => {
+      this.tweens.add({
+        targets: elements,
+        alpha: 0,
+        duration: 700,
+        onComplete: () => {
+          elements.forEach(c => c.destroy());
+          this.textePieces.setVisible(true);
+        }
+      });
+    });
   }
 }
