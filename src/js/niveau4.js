@@ -163,7 +163,8 @@ calque_boules.objects.forEach(point => {
         var b = this.groupeBoules.create(point.x, point.y, 'boule');
         b.setScale(0.5);
         b.refreshBody();
-        b.body.setCircle(30);
+        b.body.setCircle(18);
+        b.body.setOffset(13, 11);
     }
 });
 

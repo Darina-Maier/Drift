@@ -51,7 +51,6 @@ export default class niveau3 extends Phaser.Scene {
 
     this.load.image('piece3', 'src/assets/elemn3/en31.png');
 
-
   }
 
   create() {
