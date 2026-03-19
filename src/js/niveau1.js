@@ -231,5 +231,6 @@ export default class niveau1 extends Phaser.Scene {
   }
 }
 
+
 // autres fonctions
 // fonction ramasser element

@@ -533,6 +533,10 @@ export default class niveau7 extends Phaser.Scene {
 
   ramasserPiece(player, piece) {
     piece.disableBody(true, true);
+  finNiveau(player, teleporter) {
+    // Empêcher les appels multiples
+    if (this.finNiveauAppele) return;
+    this.finNiveauAppele = true;
 
     // Si toutes les pièces du niveau sont ramassées → niveau terminé
     if (this.groupe_pieces.countActive() === 0) {
@@ -555,5 +559,18 @@ export default class niveau7 extends Phaser.Scene {
 
     if (this.musiqueNiveau7) this.musiqueNiveau7.stop();
     this.scene.start('pageprincipale');
+    // Arrêter la musique du niveau 7
+    if (this.musiqueNiveau7) {
+      this.musiqueNiveau7.stop();
+    }
+
+    // Fondu progressif (fade out)
+    this.cameras.main.fadeOut(1500, 0, 0, 0);
+
+    // Attendre la fin du fondu puis changer de niveau
+    this.time.delayedCall(1500, () => {
+      this.scene.start('pageprincipale');
+    });
   }
+}
 }

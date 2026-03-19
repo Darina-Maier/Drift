@@ -180,6 +180,16 @@ export default class pageprincipale extends Phaser.Scene {
         boutonentrer = this.input.keyboard.addKey('E');
         boutoncourir = this.input.keyboard.addKey('C');
 
+        // Créer le sticker "E" invisible au départ (même style que niveau7)
+        this.stickeurE = this.add.text(0, 0, 'E', {
+            fontSize: '24px',
+            fill: '#ffffff',
+            backgroundColor: '#000000'
+        });
+        this.stickeurE.setOrigin(0.5);
+        this.stickeurE.setVisible(false);
+        this.stickeurE.setDepth(10); // pour qu'il soit au-dessus des autres objets
+
         //animations
         this.anims.create({
             key: 'anim_droite',

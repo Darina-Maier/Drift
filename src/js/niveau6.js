@@ -121,6 +121,12 @@ export default class niveau6 extends Phaser.Scene {
 
     // création du groupe des météorites
     this.groupeMeteorites = this.physics.add.group();
+    this.texteVies.setScrollFactor(0);
+
+    /***********************************************************************/
+    /** PIECES
+    /***********************************************************************/
+    this.groupe_pieces = this.physics.add.group();
 
     this.time.addEvent({
       delay: 2000,

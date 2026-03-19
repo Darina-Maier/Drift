@@ -3,8 +3,6 @@
 /***********************************************************************/
 var player;
 var clavier;
-var timerText;
-var timeRemaining;
 var boutoncourir;
 var calque_plateforme1;
 var calque_plateforme2;
@@ -171,20 +169,6 @@ export default class niveau2 extends Phaser.Scene {
     this.cameras.main.startFollow(this.player);
     this.physics.world.setBounds(0, 0, 3072, 768);
 
-    // Timer de 90 secondes
-    timeRemaining = 90;
-    timerText = this.add.text(20, 20, "Temps: 1:30", {
-      fontSize: "32px", fill: "#ffffff", fontStyle: "bold"
-    });
-    timerText.setScrollFactor(0);
-
-    this.time.addEvent({
-      delay: 1000,
-      callback: this.updateTimer,
-      callbackScope: this,
-      loop: true
-    });
-
     this.physics.world.gravity.y = 500;
 
     // animation du téléporteur avec les 9 images
@@ -247,7 +231,7 @@ export default class niveau2 extends Phaser.Scene {
         this.player.anims.play('anim_gauche', true);
         this.player.setOffset(42, 10);
       } else {
-        this.player.setVelocityX(0); // ← action séparée
+        this.player.setVelocityX(0); // action séparée
         if (this.player.direction == 'droite') {
           this.player.anims.play('immobiledroit', true);
         } else {
@@ -307,33 +291,12 @@ export default class niveau2 extends Phaser.Scene {
     });
   }
 
-  updateTimer() {
-    timeRemaining--;
-    const minutes = Math.floor(timeRemaining / 60);
-    const seconds = timeRemaining % 60;
-    const displaySeconds = seconds < 10 ? '0' + seconds : seconds;
-    timerText.setText('Temps: ' + minutes + ':' + displaySeconds);
-
-    // Rouge quand il reste 15 secondes
-    if (timeRemaining <= 15) {
-      timerText.setFill('#ff0000');
-    }
-
-    // Timer écoulé → reset position + repart de 90 secondes
-    if (timeRemaining <= 0) {
-      this.player.setPosition(100, 450);
-      this.player.setVelocity(0, 0);
-      timeRemaining = 90;
-      timerText.setFill('#ffffff');
-    }
-  }
-
   finNiveau(player, teleporter) {
-    // optionnel : désactiver le joueur pour éviter multi déclenchement
+    
     player.setVelocity(0);
     player.disableBody(true, true);
 
-    // on ne valide que si toutes les pièces ont été ramassées
+    
     if (this.niveauComplete) {
       let niveauxFinis = this.game.registry.get('niveauxFinis');
       if (!niveauxFinis.includes('niveau2')) {

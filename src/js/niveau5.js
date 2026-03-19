@@ -374,6 +374,141 @@ export default class niveau5 extends Phaser.Scene {
   }
 
   ramasserPiece(player, piece) {
+  if (Phaser.Input.Keyboard.JustDown(boutonFeu)) {
+    this.isTir = true;
+
+    if (this.player.direction == 'droite') {
+      this.player.anims.play('tir_droite');
+    } else {
+      this.player.anims.play('tir_gauche');
+    }
+
+    this.tirer(this.player);
+
+    this.time.delayedCall(300, () => {
+      this.isTir = false;
+    });
+  }
+
+  // appuie sur G pour changer la gravité 
+if (Phaser.Input.Keyboard.JustDown(this.toucheGravite)) {
+    if (this.gravityInverted == true) {
+            this.player.body.gravity.y = -600;  // gravité vers le bas
+this.gravityInverted = false;
+//    this.physics.world.gravity.y = -200; // gravité vers le haut
+    this.player.setFlipY(true); // retourne le sprite du joueur
+      } else {
+      this.gravityInverted = true;
+      this.player.body.gravity.y = 0;  // gravité vers le bas
+      this.player.setFlipY(false); // remet le sprite du joueur à l'endroit
+
+    }
+  }
+}
+
+  creerMeteorite() {
+
+   
+  let frameAleatoire = Phaser.Math.Between(0, 3);
+  let xAleatoire = Phaser.Math.Between(this.player.x - 300, this.player.x + 300);
+  xAleatoire = Phaser.Math.Clamp(xAleatoire, 50, 3000);
+  let meteorite = this.groupeMeteorites.create(xAleatoire, this.player.y - 400, 'meteorites', frameAleatoire);
+   
+  meteorite.body.allowGravity = false;
+  meteorite.setVelocityY(20);
+
+  meteorite.setVelocityX(Phaser.Math.Between(-30, 30));
+  meteorite.setBounce(0);
+  meteorite.setScale(0.3);
+  meteorite.setSize(100, 100);
+}
+
+tirer(player) {
+
+
+  let coefDir;
+
+  if (player.direction == 'gauche') {
+    coefDir = -1;
+  } else {
+    coefDir = 1;
+  }
+
+  // création de la balle à côté du joueur
+  let bullet = groupeBullets.create(player.x + (25 * coefDir), player.y - 4, 'bullet');
+
+  bullet.setScale(0.5);
+  bullet.setSize(50,50);
+  bullet.body.allowGravity = false;
+
+  bullet.setCollideWorldBounds(true);
+  bullet.body.onWorldBounds = true;
+
+  // vitesse de la balle
+  bullet.setVelocity(700 * coefDir, 0);
+}
+
+hitMeteorite(bullet, meteorite) {
+
+  // destruction de la balle
+  bullet.destroy();
+
+  // destruction de la météorite
+  meteorite.destroy();
+}
+
+toucheMeteorite(player, meteorite) {
+
+  // destruction de la météorite
+  meteorite.destroy();
+
+  // le joueur perd une vie
+  this.vies--;
+
+  // effet visuel rouge
+  player.setTint(0xff0000);
+
+  // petit recul
+  player.setVelocityY(-200);
+
+  // enlève la teinte rouge après un court instant
+  this.time.delayedCall(200, () => {
+    player.clearTint();
+  });
+
+  // affiche le nombre de vies restant dans la console
+  console.log("Vies restantes :", this.vies);
+
+  // si le joueur n'a plus de vie
+  if (this.vies <= 0) {
+    this.scene.restart();
+  }
+}
+
+finNiveau(player, teleporter) {
+  // Empêcher les appels multiples
+  if (this.finNiveauAppele) return;
+  this.finNiveauAppele = true;
+
+  // optionnel : désactiver le joueur pour éviter multi déclenchement
+  player.setVelocity(0);
+  player.disableBody(true, true);
+
+  // Arrêter la musique du niveau 5
+  if (this.musiqueNiveau5) {
+    this.musiqueNiveau5.stop();
+  }
+
+  // Fondu progressif (fade out)
+  this.cameras.main.fadeOut(1500, 0, 0, 0);
+
+  // Attendre la fin du fondu puis changer de niveau
+  this.time.delayedCall(1500, () => {
+    this.scene.start('pageprincipale');
+  });
+}
+
+ramasserPiece(player, piece) {
     piece.disableBody(true, true);
 
     // si toutes les pièces sont ramassées → niveau complet
