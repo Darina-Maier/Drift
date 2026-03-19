@@ -10,28 +10,25 @@ export default class intro extends Phaser.Scene {
             frameWidth: 130,
             frameHeight: 90
         });
-    this.load.audio("alarme", "src/assets/sons/alarm.ogg");
-}
+        this.load.audio("alarme", "src/assets/sons/alarm.ogg");
+    }
 
     create() {
         this.cameras.main.setBackgroundColor('#000000');
-        // appliquer l'état global du son
-this.sound.mute = !this.game.soundOn;
+        this.sound.mute = !this.game.soundOn;
 
-// bouton Sound ON / OFF
-this.boutonSon = this.add.text(880, 20, this.game.soundOn ? "Sound ON" : "Sound OFF", {
-    fontSize: "24px",
-    fill: "#ffffff",
-    backgroundColor: "#000000"
-}).setInteractive();
-
-this.boutonSon.setScrollFactor(0);
-
-this.boutonSon.on("pointerdown", () => {
-    this.game.soundOn = !this.game.soundOn;
-    this.sound.mute = !this.game.soundOn;
-    this.boutonSon.setText(this.game.soundOn ? "Sound ON" : "Sound OFF");
-});
+        // Bouton son
+        this.boutonSon = this.add.text(880, 20, this.game.soundOn ? "Sound ON" : "Sound OFF", {
+            fontSize: "24px",
+            fill: "#ffffff",
+            backgroundColor: "#000000"
+        }).setInteractive();
+        this.boutonSon.setScrollFactor(0);
+        this.boutonSon.on("pointerdown", () => {
+            this.game.soundOn = !this.game.soundOn;
+            this.sound.mute = !this.game.soundOn;
+            this.boutonSon.setText(this.game.soundOn ? "Sound ON" : "Sound OFF");
+        });
 
         // Personnage
         this.perso = this.physics.add.sprite(250, 450, 'astronaut');
@@ -75,13 +72,13 @@ this.boutonSon.on("pointerdown", () => {
         this.texteBulle.setVisible(false);
 
         // Texte "appuie sur espace"
-        this.texteEspace = this.add.text(350, 650,
-            'Appuie sur ESPACE pour continuer...', {
+        this.texteEspace = this.add.text(350, 650, 'Appuie sur ESPACE pour continuer...', {
             fontSize: '14px',
             fill: '#aaaaaa',
             align: 'center'
         });
         this.texteEspace.setOrigin(0.5);
+        this.texteEspace.setVisible(false);
 
         // Texte final
         this.texteFinal = this.add.text(400, 350,
@@ -96,34 +93,60 @@ this.boutonSon.on("pointerdown", () => {
         // Touche espace
         this.touche_espace = this.input.keyboard.addKey('SPACE');
 
-        // Dialogues
+        // Dialogues (index 0 à 3)
         this.dialogues = [
-            "Bonjour ! Je m'appelle Winston, chercheur en physique quantique spatiale.",
-            "Après des années de recherches, ma fusée est enfin prête pour le grand décollage !",
-            "Je m'apprête à prendre l'envol... direction les confins de l'univers !",
-            "Tout est nominal. Systèmes en ligne. Décollage imminent...",]
+            "Bonjour ! Je m'appelle Winston, physicien et astronaute !",
+            "Après des années de voyage spatial, j'ai hâte de rentrer sur Terre...",
+            "Ma fusée est prête pour le grand décollage !",
+            "Tout est prêt. Systèmes en ligne. Décollage imminent...",
+        ];
 
         this.indexDialogue = 0;
-        this.etape = 'dialogue'; // dialogue → marche → decollage → fin
+        this.etape = 'dialogue';
 
         // Affiche le premier dialogue
         this.afficherDialogue(0);
     }
 
+    // Effet machine à écrire
+    ecrireLetterByLetter(texteObj, message, vitesse = 40, onComplete = null) {
+        if (!message) return;
+        texteObj.setText('');
+        let i = 0;
+        this.input.keyboard.enabled = false;
+        this.texteEspace.setVisible(false);
+
+        if (this.timerEcriture) {
+            this.timerEcriture.remove();
+        }
+
+        this.timerEcriture = this.time.addEvent({
+            delay: vitesse,
+            repeat: message.length - 1,
+            callback: () => {
+                texteObj.setText(texteObj.text + message[i]);
+                i++;
+                if (i >= message.length) {
+                    this.input.keyboard.enabled = true;
+                    this.texteEspace.setVisible(true);
+                    if (onComplete) onComplete();
+                }
+            }
+        });
+    }
+
     afficherDialogue(index) {
         this.bulle.setVisible(true);
         this.texteBulle.setVisible(true);
-        this.texteBulle.setText(this.dialogues[index]);
+        this.ecrireLetterByLetter(this.texteBulle, this.dialogues[index], 40);
     }
 
     lancerMarche() {
-        // Cache la bulle
         this.bulle.setVisible(false);
         this.texteBulle.setVisible(false);
         this.texteEspace.setVisible(false);
         this.etape = 'marche';
 
-        // Personnage marche
         this.perso.anims.play('anim_droite', true);
         this.perso.body.velocity.x = 120;
     }
@@ -132,23 +155,26 @@ this.boutonSon.on("pointerdown", () => {
         this.etape = 'decollage';
         this.flammes.setVisible(true);
 
-        // Fusée décolle
         this.tweens.add({
             targets: [this.fusee, this.flammes, this.perso],
             y: '-=700',
             duration: 3000,
             ease: 'Power2',
             onComplete: () => {
-    // Flash rouge = explosion
-    this.cameras.main.flash(800, 255, 50, 0);
-    this.sound.play("alarme");
-    this.etape = 'fin';
+                this.cameras.main.flash(800, 255, 50, 0);
+                this.sound.play("alarme");
+                this.etape = 'fin';
 
                 this.time.delayedCall(1500, () => {
                     this.texteEspace.setVisible(false);
                     this.texteFinal.setVisible(true);
+                    this.ecrireLetterByLetter(
+                        this.texteFinal,
+                        '💥 Ma fusée vient de percuter une météorite !\nJ\'ai perdu toutes les pièces...\nAide-moi à les retrouver !',
+                        40
+                    );
 
-                    this.time.delayedCall(3000, () => {
+                    this.time.delayedCall(4000, () => {
                         this.cameras.main.fadeOut(1000);
                         this.time.delayedCall(1000, () => {
                             this.scene.start('pageprincipale');
@@ -157,43 +183,35 @@ this.boutonSon.on("pointerdown", () => {
                 });
             }
         });
-
     }
 
     update() {
-        // Personnage marche → vérifie s'il est arrivé
+        // Personnage marche → vérifie s'il est arrivé à la fusée
         if (this.etape === 'marche') {
             if (this.perso.x >= 520) {
                 this.perso.body.velocity.x = 0;
                 this.perso.anims.play('immobiledroit');
                 this.etape = 'dialogue2';
-                this.indexDialogue = 3;
                 this.afficherDialogue(3);
-                this.texteEspace.setVisible(true);
             }
         }
 
-        // Espace → avance
+        // Espace → avance dans les dialogues
         if (Phaser.Input.Keyboard.JustDown(this.touche_espace)) {
             if (this.etape === 'dialogue') {
                 this.indexDialogue++;
                 if (this.indexDialogue <= 2) {
-                    // Dialogue 0, 1, 2 → affiche le suivant
                     this.afficherDialogue(this.indexDialogue);
                 } else {
-                    // Après dialogue 2 → marche
+                    // Après dialogue 2 → marche vers la fusée
                     this.lancerMarche();
                 }
             } else if (this.etape === 'dialogue2') {
-                this.indexDialogue++;
-                if (this.indexDialogue <= 4) {
-                    this.afficherDialogue(this.indexDialogue);
-                } else {
-                    // Après dernier dialogue → décollage
-                    this.bulle.setVisible(false);
-                    this.texteBulle.setVisible(false);
-                    this.lancerDecollage();
-                }
+                // Après dialogue 3 → décollage
+                this.bulle.setVisible(false);
+                this.texteBulle.setVisible(false);
+                this.texteEspace.setVisible(false);
+                this.lancerDecollage();
             }
         }
     }
