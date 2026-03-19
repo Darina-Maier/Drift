@@ -56,6 +56,9 @@ export default class niveau7 extends Phaser.Scene {
     this.load.image('tp08', 'src/assets/teleporter/tp08.png');
     this.load.image('tp09', 'src/assets/teleporter/tp09.png');
 
+    //chargement piece7
+    this.load.image('piece7', 'src/assets/tuilesn7/piece7.png');
+
     //plateforme mobile
     this.load.image('platforme_mobile', 'src/assets/tuilesn7/plateforme_mobile.png');
     this.load.image('platforme_mobile2', 'src/assets/tuilesn7/plateforme2_mobile.png');
@@ -393,6 +396,27 @@ export default class niveau7 extends Phaser.Scene {
 
     this.infoGravite.setDepth(10);
 
+    // création pièces
+    this.groupe_pieces = this.physics.add.staticGroup();
+    // Récupère le calque objet
+    const calque_objets = carten7.getObjectLayer('calque_objet7');
+
+    // Parcourt les objets du calque et crée les pièces
+    calque_objets.objects.forEach(point => {
+      if (point.name == 'piecearamasser7') {
+        var nouvelle_piece = this.groupe_pieces.create(point.x, point.y, 'piece7');
+        nouvelle_piece.setScale(1.5);
+        this.groupe_pieces.add(nouvelle_piece);
+      }
+    });
+
+    // PERMET DE RAMASSER LES PIECES
+    this.physics.add.overlap(this.player, this.groupe_pieces, this.ramasserPiece, null, this);
+
+
+
+
+
   }
 
   update() {
@@ -498,6 +522,9 @@ export default class niveau7 extends Phaser.Scene {
     this.scene.start('pageprincipale');
   }
 
-
+  ramasserPiece(player, piece) {
+    piece.disableBody(true, true);
+    // Ici tu peux ajouter du code pour augmenter le score ou autre
+  }
 }
 
