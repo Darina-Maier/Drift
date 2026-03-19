@@ -81,7 +81,7 @@ export default class pageprincipale extends Phaser.Scene {
         p5 = this.physics.add.staticSprite(1208, 384, 'planete5');
         p6 = this.physics.add.staticSprite(1454, 384, 'planete6');
         p7 = this.physics.add.staticSprite(1700, 384, 'planete7');
-        var p8 = this.physics.add.staticSprite(1946, 384, 'planete8');
+        p8 = this.physics.add.staticSprite(1946, 384, 'planete8');
         var plateforme = this.physics.add.staticSprite(0, 384, 'plateforme1');
 
         // Compteur pièces (fixe à l'écran)
@@ -229,16 +229,14 @@ export default class pageprincipale extends Phaser.Scene {
 
     }
 
-    /***********************************************************************/
-    /** FONCTION UPDATE 
-  /***********************************************************************/
+    
 
     update() {
         // Mise à jour compteur
         const pieces = this.game.registry.get('pieces');
         const piecesTotal = this.game.registry.get('piecesTotal');
         const niveauxFinis = this.game.registry.get('niveauxFinis');
-        this.textePieces.setText('🔧 Pièces : ' + pieces + ' / ' + piecesTotal);
+        this.textePieces.setText('🪐 Planètes : ' + niveauxFinis.length + ' / 7');
 
         // Affiche overlays des niveaux terminés
         const planetes = { niveau1: p1, niveau2: p2, niveau3: p3, niveau4: p4, niveau5: p5, niveau6: p6, niveau7: p7 };
@@ -249,11 +247,11 @@ export default class pageprincipale extends Phaser.Scene {
         });
 
         // Terre : bloquée tant que toutes les pièces ne sont pas récupérées
-        const terreDeverrouillee = pieces >= piecesTotal;
+        const terreDeverrouillee = niveauxFinis.length >= 7;
         this.overlayTerre.setVisible(!terreDeverrouillee);
         this.texteTerre.setVisible(!terreDeverrouillee);
 
-        // Mouvements joueur (ton code existant)
+        // Mouvements joueur 
         if (boutoncourir.isDown) {
             if (player.direction == 'droite') {
                 player.setVelocityX(300);
@@ -309,11 +307,15 @@ export default class pageprincipale extends Phaser.Scene {
             // Terre : seulement si toutes les pièces récupérées
             if (this.physics.overlap(player, p8) && terreDeverrouillee) {
                 this.scene.start('niveauTerre'); // à adapter selon ton nom de scène
+
             }
+
+        }
+        //triche
+        // Touche de triche : T = tout débloquer
+        if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('T'))) {
+            this.game.registry.set('niveauxFinis', ['niveau1', 'niveau2', 'niveau3', 'niveau4', 'niveau5', 'niveau6', 'niveau7']);
         }
     }
 }
 
-/***********************************************************************/
-/** CONFIGURATION GLOBALE DU JEU ET LANCEMENT 
-/***********************************************************************/

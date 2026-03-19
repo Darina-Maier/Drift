@@ -37,9 +37,7 @@ var config = {
 var game = new Phaser.Game(config);
 
 game.events.once('ready', () => {
-    game.registry.set('pieces', 0);        // pièces collectées
-    game.registry.set('piecesTotal', 7);   // 1 pièce par niveau
-    game.registry.set('niveauxFinis', []); // niveaux terminés
+    game.registry.set('niveauxFinis', []);
     game.soundOn = true;
 });
 

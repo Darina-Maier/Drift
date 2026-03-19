@@ -412,7 +412,9 @@ export default class niveau7 extends Phaser.Scene {
 
     // PERMET DE RAMASSER LES PIECES
     this.physics.add.overlap(this.player, this.groupe_pieces, this.ramasserPiece, null, this);
-
+    
+    //initialisation flag
+    this.niveauComplete = false;
 
 
 
@@ -510,29 +512,41 @@ export default class niveau7 extends Phaser.Scene {
     } else {
       this.aideLevier.setVisible(false);
     }
+
+    // Touche de triche : T = terminer le niveau
+if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('T'))) {
+    this.niveauComplete = true;
+    this.finNiveau(this.player, this.teleporter);
+}
   }
 
   ramasserPiece(player, piece) {
     piece.disableBody(true, true);
 
-    // Incrémenter le compteur global
-    let pieces = this.game.registry.get('pieces');
-    this.game.registry.set('pieces', pieces + 1);
+    // Si toutes les pièces du niveau sont ramassées → niveau terminé
+    if (this.groupe_pieces.countActive() === 0) {
+        this.niveauComplete = true;
+    }
 }
 
 finNiveau(player, teleporter) {
     player.setVelocity(0);
     player.disableBody(true, true);
 
-    // Marquer ce niveau comme terminé
-    let niveauxFinis = this.game.registry.get('niveauxFinis');
-    if (!niveauxFinis.includes('niveau7')) {
-        niveauxFinis.push('niveau7');
-        this.game.registry.set('niveauxFinis', niveauxFinis);
+    // On ne valide que si toutes les pièces ont été ramassées
+    if (this.niveauComplete) {
+        let niveauxFinis = this.game.registry.get('niveauxFinis');
+        if (!niveauxFinis.includes('niveau7')) { // ← changer le nom selon le niveau
+            niveauxFinis.push('niveau7');
+            this.game.registry.set('niveauxFinis', niveauxFinis);
+        }
     }
 
     if (this.musiqueNiveau7) this.musiqueNiveau7.stop();
     this.scene.start('pageprincipale');
+
+
 }
+
 }
 
