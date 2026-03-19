@@ -67,7 +67,7 @@ export default class niveau1 extends Phaser.Scene {
     // Collision death — tue le joueur
     calque_death.setCollisionByProperty({ estSolide: true });
 
-    this.player = this.physics.add.sprite(120,450, 'astronaut');
+    this.player = this.physics.add.sprite(120, 450, 'astronaut');
     this.player.setSize(50, 70);
     this.player.setOffset(36, 10);
     this.player.setCollideWorldBounds(true);
@@ -132,22 +132,38 @@ export default class niveau1 extends Phaser.Scene {
 
     this.physics.add.overlap(this.player, this.groupe_pieces, this.ramasserPiece, null, this);
 
+    // affichage du nombre de pièces restantes
+    this.totalPieces = this.groupe_pieces.getChildren().length;
+    this.textePieces = this.add.text(16, 16, '', {
+      fontSize: '20px',
+      fill: '#ffffff',
+      backgroundColor: '#000000',
+      padding: { x: 8, y: 4 }
+    }).setScrollFactor(0).setDepth(10);
+
     // flag niveau complet
     this.niveauComplete = false;
   }
 
   update() {
-    // touche triche : T = ramasse toutes les pièces sans valider le niveau
-    if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('T'))) {
-    this.groupe_pieces.getChildren().forEach(piece => {
-        piece.disableBody(true, true);
-    });
-    // vérifie si toutes les pièces sont ramassées
-    if (this.groupe_pieces.countActive() === 0) {
-        this.niveauComplete = true;
-    }
-}
 
+    // MISE À JOUR DU COMPTEUR DE PIÈCES
+    const piecesRestantes = this.groupe_pieces.countActive();
+    const piecesRamassees = this.totalPieces - piecesRestantes;
+    this.textePieces.setText('🪙 Pièces : ' + piecesRamassees + ' / ' + this.totalPieces);
+
+    // touche triche : T = ramasse toutes les pièces sans valider le niveau
+    //if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('T'))) {
+    // this.groupe_pieces.getChildren().forEach(piece => {
+    //    piece.disableBody(true, true);
+    // });
+    // vérifie si toutes les pièces sont ramassées
+    // if (this.groupe_pieces.countActive() === 0) {
+    //   this.niveauComplete = true;
+    // }
+    // }
+
+    // déplacement du joueur
     if (boutoncourir.isDown) {
       if (this.player.direction == 'droite') {
         // this.player.setOffset(76, 0);

@@ -152,6 +152,18 @@ export default class niveau2 extends Phaser.Scene {
       this.scene.restart();
     });
 
+    // Collisions avec les plateformes et les zones de mort
+    this.totalPieces = this.groupe_pieces.getChildren().length;
+    this.textePieces = this.add.text(16, 16, '', {
+      fontSize: '20px',
+      fill: '#ffffff',
+      fontFamily: 'Orbitron',
+      backgroundColor: '#000000',
+      padding: { x: 8, y: 4 }
+    }).setScrollFactor(0).setDepth(10);
+
+    this.niveauComplete = false;
+
     //COLLIDERS
     this.physics.add.collider(this.player, calque_plateforme1);
     this.physics.add.collider(this.player, calque_plateforme2);
@@ -201,14 +213,14 @@ export default class niveau2 extends Phaser.Scene {
   update() {
     /// touche triche : T = ramasse toutes les pièces sans valider le niveau
     if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('T'))) {
-    this.groupe_pieces.getChildren().forEach(piece => {
+      this.groupe_pieces.getChildren().forEach(piece => {
         piece.disableBody(true, true);
-    });
-    // vérifie si toutes les pièces sont ramassées
-    if (this.groupe_pieces.countActive() === 0) {
+      });
+      // vérifie si toutes les pièces sont ramassées
+      if (this.groupe_pieces.countActive() === 0) {
         this.niveauComplete = true;
+      }
     }
-}
     if (boutoncourir.isDown) {
       if (this.player.direction == 'droite') {
         // this.player.setOffset(76, 0);
@@ -292,11 +304,11 @@ export default class niveau2 extends Phaser.Scene {
   }
 
   finNiveau(player, teleporter) {
-    
+
     player.setVelocity(0);
     player.disableBody(true, true);
 
-    
+
     if (this.niveauComplete) {
       let niveauxFinis = this.game.registry.get('niveauxFinis');
       if (!niveauxFinis.includes('niveau2')) {
