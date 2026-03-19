@@ -211,16 +211,21 @@ export default class niveau2 extends Phaser.Scene {
   }
 
   update() {
+    const piecesRestantes = this.groupe_pieces.countActive();
+    const piecesRamassees = this.totalPieces - piecesRestantes;
+    this.textePieces.setText('🪙 Pièces : ' + piecesRamassees + ' / ' + this.totalPieces);
+
     /// touche triche : T = ramasse toutes les pièces sans valider le niveau
-    if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('T'))) {
-      this.groupe_pieces.getChildren().forEach(piece => {
-        piece.disableBody(true, true);
-      });
-      // vérifie si toutes les pièces sont ramassées
-      if (this.groupe_pieces.countActive() === 0) {
-        this.niveauComplete = true;
-      }
-    }
+    // if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('T'))) {
+    //  this.groupe_pieces.getChildren().forEach(piece => {
+    //    piece.disableBody(true, true);
+    // });
+    // vérifie si toutes les pièces sont ramassées
+    // if (this.groupe_pieces.countActive() === 0) {
+    //   this.niveauComplete = true;
+    // }
+    // }
+
     if (boutoncourir.isDown) {
       if (this.player.direction == 'droite') {
         // this.player.setOffset(76, 0);
