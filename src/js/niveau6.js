@@ -3,8 +3,6 @@
 /***********************************************************************/
 var player;
 var clavier;
-var boutonFeu;
-var groupeBullets;
 
 export default class niveau6 extends Phaser.Scene {
   // constructeur de la classe
@@ -33,13 +31,11 @@ export default class niveau6 extends Phaser.Scene {
       frameHeight: 90
     });
 
-    // chargement meteorite
-    this.load.spritesheet('meteorites', 'src/assets/fishrobot.png', {
+    // chargement fishrobot
+    this.load.spritesheet('fishrobot', 'src/assets/fishrobot.png', {
       frameWidth: 41,
       frameHeight: 61
     });
-    // chargement tir
-    this.load.image("bullet", "src/assets/tuilesn5/balle.png");
 
     // chargement des 9 images du téléporteur
     this.load.image('tp01', 'src/assets/teleporter/tp01.png');
@@ -119,50 +115,20 @@ export default class niveau6 extends Phaser.Scene {
       frameRate: 10
     });
 
-    // création du groupe des météorites
-    this.groupeMeteorites = this.physics.add.group();
-
-    this.time.addEvent({
-      delay: 2000,
-      callback: this.creerMeteorite,
-      callbackScope: this,
-      loop: true
-    });
-
-    // affectation de la touche A au tir
-    boutonFeu = this.input.keyboard.addKey('A');
-
-    // création du groupe des balles
-    groupeBullets = this.physics.add.group();
-
-    this.clavier = this.input.keyboard.createCursorKeys();
-
-    this.physics.world.on("worldbounds", function(body) {
-      var objet = body.gameObject;
-      if (groupeBullets.contains(objet)) {
-        objet.destroy();
-      }
-    });
-
+    // Animation fish robot
     this.anims.create({
-      key: 'tir_droite',
-      frames: this.anims.generateFrameNumbers('astronaut', { start: 34, end: 35 }),
-      frameRate: 10,
-      repeat: 0
-    });
-    this.anims.create({
-      key: 'tir_gauche',
-      frames: this.anims.generateFrameNumbers('astronautinverse', { start: 31, end: 30 }),
-      frameRate: 10,
-      repeat: 0
+      key: 'anim_fishrobot',
+      frames: this.anims.generateFrameNumbers('fishrobot', { start: 0, end: 2 }),
+      frameRate: 6,
+      repeat: -1
     });
 
-    this.isTir = false;
-    // collision entre les balles et les météorites
-    this.physics.add.overlap(groupeBullets, this.groupeMeteorites, this.hitMeteorite, null, this);
+    // création du groupe des fish robots
+    this.poissons = [];
+    this.creerPoissonsAleatoires();
     this.vies = 3;
-    // contact joueur meteorite
-    this.physics.add.overlap(this.player, this.groupeMeteorites, this.toucheMeteorite, null, this);
+    // collision joueur vs fish robots
+    this.physics.add.overlap(this.player, this.poissons, this.toucherPoisson, null, this);
 
     this.toucheGravite = this.input.keyboard.addKey('G');
 
@@ -239,22 +205,33 @@ export default class niveau6 extends Phaser.Scene {
     // }
     // }
 
-    if (!this.isTir) {
-      if (this.clavier.right.isDown) {
-        this.player.setVelocityX(160);
-        this.player.direction = 'droite';
-        this.player.anims.play('anim_droite', true);
-      } else if (this.clavier.left.isDown) {
-        this.player.setVelocityX(-160);
-        this.player.direction = 'gauche';
-        this.player.anims.play('anim_gauche', true);
+    // Gestion des aller-retour des poissons
+    this.poissons.forEach((poisson) => {
+      if (poisson.x < 100) {
+        poisson.direction = 1;
+        poisson.setFlipX(false);
+        poisson.setVelocityX(60);
+      } else if (poisson.x > 2972) {
+        poisson.direction = -1;
+        poisson.setFlipX(true);
+        poisson.setVelocityX(-60);
+      }
+    });
+
+    if (this.clavier.right.isDown) {
+      this.player.setVelocityX(160);
+      this.player.direction = 'droite';
+      this.player.anims.play('anim_droite', true);
+    } else if (this.clavier.left.isDown) {
+      this.player.setVelocityX(-160);
+      this.player.direction = 'gauche';
+      this.player.anims.play('anim_gauche', true);
+    } else {
+      this.player.setVelocityX(0);
+      if (this.player.direction == 'droite') {
+        this.player.anims.play('immobiledroit', true);
       } else {
-        this.player.setVelocityX(0);
-        if (this.player.direction == 'droite') {
-          this.player.anims.play('immobiledroit', true);
-        } else {
-          this.player.anims.play('immobilegauche', true);
-        }
+        this.player.anims.play('immobilegauche', true);
       }
     }
 
@@ -265,22 +242,6 @@ export default class niveau6 extends Phaser.Scene {
     if (Phaser.Input.Keyboard.JustDown(this.clavier.up)) {
       if (this.musiqueNiveau6) this.musiqueNiveau6.stop();
       this.scene.start('pageprincipale');
-    }
-
-    if (Phaser.Input.Keyboard.JustDown(boutonFeu)) {
-      this.isTir = true;
-
-      if (this.player.direction == 'droite') {
-        this.player.anims.play('tir_droite');
-      } else {
-        this.player.anims.play('tir_gauche');
-      }
-
-      this.tirer(this.player);
-
-      this.time.delayedCall(300, () => {
-        this.isTir = false;
-      });
     }
 
     // appuie sur G pour changer la gravité
@@ -298,74 +259,52 @@ export default class niveau6 extends Phaser.Scene {
     }
   }
 
-  creerMeteorite() {
-    let frameAleatoire = Phaser.Math.Between(0, 3);
-    let xAleatoire = Phaser.Math.Between(this.player.x - 300, this.player.x + 300);
-    xAleatoire = Phaser.Math.Clamp(xAleatoire, 50, 3000);
-    let meteorite = this.groupeMeteorites.create(xAleatoire, this.player.y - 400, 'meteorites', frameAleatoire);
+  creerPoissonsAleatoires() {
+    for (let i = 0; i < 6; i++) {
+      let xAleatoire = Phaser.Math.Between(200, 2800);
+      let yAleatoire = Phaser.Math.Between(100, 600);
 
-    meteorite.body.allowGravity = false;
-    meteorite.setVelocityY(20);
-    meteorite.setVelocityX(Phaser.Math.Between(-30, 30));
-    meteorite.setBounce(0);
-    meteorite.setScale(0.3);
-    meteorite.setSize(100, 100);
-  }
-
-  tirer(player) {
-    let coefDir;
-
-    if (player.direction == 'gauche') {
-      coefDir = -1;
-    } else {
-      coefDir = 1;
+      this.creerPoisson(xAleatoire, yAleatoire);
     }
-
-    // création de la balle à côté du joueur
-    let bullet = groupeBullets.create(player.x + (25 * coefDir), player.y - 4, 'bullet');
-
-    bullet.setScale(0.5);
-    bullet.setSize(50, 50);
-    bullet.body.allowGravity = false;
-    bullet.setCollideWorldBounds(true);
-    bullet.body.onWorldBounds = true;
-
-    // vitesse de la balle
-    bullet.setVelocity(700 * coefDir, 0);
   }
 
-  hitMeteorite(bullet, meteorite) {
-    // destruction de la balle
-    bullet.destroy();
+  creerPoisson(x, y) {
+    let poisson = this.physics.add.sprite(x, y, "fishrobot");
+    poisson.body.allowGravity = false;
+    poisson.anims.play("anim_fishrobot", true);
+    poisson.setScale(0.8);
+    poisson.direction = Phaser.Math.Between(0, 1) === 0 ? -1 : 1;
+    // Si direction = 1 (droite), flip = false. Si direction = -1 (gauche), flip = true
+    if (poisson.direction === 1) {
+      poisson.setFlipX(false); // regarde à droite
+    } else {
+      poisson.setFlipX(true); // regarde à gauche
+    }
+    poisson.setVelocityX(60 * poisson.direction);
+    poisson.HP = 1;
 
-    // destruction de la météorite
-    meteorite.destroy();
+    this.poissons.push(poisson);
   }
 
-  toucheMeteorite(player, meteorite) {
-    // destruction de la météorite
-    meteorite.destroy();
+  toucherPoisson(player, poisson) {
+    // Si le joueur saute sur le poisson (vient du dessus)
+    if (player.body.velocity.y > 0 && player.y < poisson.y) {
+      poisson.destroy();
+      this.poissons = this.poissons.filter(p => p !== poisson);
+      player.setVelocityY(-300); // Rebond
+    } else {
+      // Sinon, le joueur perd une vie
+      this.vies--;
+      player.setTint(0xff0000);
+      player.setVelocityY(-200);
 
-    // le joueur perd une vie
-    this.vies--;
+      this.time.delayedCall(200, () => {
+        player.clearTint();
+      });
 
-    // effet visuel rouge
-    player.setTint(0xff0000);
-
-    // petit recul
-    player.setVelocityY(-200);
-
-    // enlève la teinte rouge après un court instant
-    this.time.delayedCall(200, () => {
-      player.clearTint();
-    });
-
-    // affiche le nombre de vies restant dans la console
-    console.log("Vies restantes :", this.vies);
-
-    // si le joueur n'a plus de vie
-    if (this.vies <= 0) {
-      this.scene.restart();
+      if (this.vies <= 0) {
+        this.scene.restart();
+      }
     }
   }
 
