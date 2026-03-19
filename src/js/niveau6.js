@@ -34,12 +34,12 @@ export default class niveau6 extends Phaser.Scene {
     });
 
     // chargement meteorite
-    this.load.spritesheet('meteorites', 'src/assets/tuilesn6/meteorite.png', {
-      frameWidth: 250,
-      frameHeight: 250
+    this.load.spritesheet('meteorites', 'src/assets/fishrobot.png', {
+      frameWidth: 41,
+      frameHeight: 61
     });
     // chargement tir
-    this.load.image("bullet", "src/assets/tuilesn6/balle.png");
+    this.load.image("bullet", "src/assets/tuilesn5/balle.png");
 
     // chargement des 9 images du téléporteur
     this.load.image('tp01', 'src/assets/teleporter/tp01.png');
@@ -78,7 +78,7 @@ export default class niveau6 extends Phaser.Scene {
     calque_plateformes6.setCollisionByProperty({ estSolide: true });
     calque_plateformes6.setCollisionByProperty({ estsolide: true });
 
-    this.player = this.physics.add.sprite(100, 0, 'astronaut');
+    this.player = this.physics.add.sprite(120, 450, 'astronaut');
     this.player.setSize(50, 70);
     this.player.setOffset(36, 10);
     this.player.setCollideWorldBounds(true);
@@ -121,12 +121,6 @@ export default class niveau6 extends Phaser.Scene {
 
     // création du groupe des météorites
     this.groupeMeteorites = this.physics.add.group();
-    this.texteVies.setScrollFactor(0);
-
-    /***********************************************************************/
-    /** PIECES
-    /***********************************************************************/
-    this.groupe_pieces = this.physics.add.group();
 
     this.time.addEvent({
       delay: 2000,
