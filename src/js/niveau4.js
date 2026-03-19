@@ -16,6 +16,10 @@ export default class niveau4 extends Phaser.Scene {
     this.load.image("bg4", "src/assets/tuilesn4/background_n4.png");
     this.load.image("t4", "src/assets/tuilesn4/Tileset_n4.png");
     this.load.image("death4", "src/assets/tuilesn4/tileset_death.png");
+    this.load.image('boule', 'src/assets/tuilesn4/boule.png');
+    //chargement piece4
+    this.load.image('piece4', 'src/assets/tuilesn4/piece4.png');
+
 
     // chargement des 9 images du téléporteur
     this.load.image('tp01', 'src/assets/teleporter/tp01.png');
@@ -78,7 +82,7 @@ this.musiqueNiveau4.play();
     
     // JOUEUR
     
-    this.player = this.physics.add.sprite(100, 450, "astronaut");
+    this.player = this.physics.add.sprite(250, 450, "astronaut");
 
     this.player.setSize(50, 70);
     this.player.setOffset(36, 10);
@@ -142,6 +146,49 @@ this.teleporter.setScale(0.3);
 this.teleporter.setSize(150,200);
 this.physics.add.overlap(this.player, this.teleporter, this.finNiveau, null, this);
 
+
+
+// création des boules depuis Tiled
+this.boules = [];
+const calque_boules = carten4.getObjectLayer('calque_boules1');
+
+if (!calque_boules) {
+    console.error("Calque boules introuvable !");
+} else {
+    this.groupeBoules = this.physics.add.staticGroup();
+
+calque_boules.objects.forEach(point => {
+    if (point.name == 'boule') {
+        this.boules.push({ x: point.x, y: point.y });
+        var b = this.groupeBoules.create(point.x, point.y, 'boule');
+        b.setScale(0.5);
+        b.refreshBody();
+        b.body.setCircle(30);
+    }
+});
+
+// collision entre le joueur et les boules
+this.physics.add.collider(this.player, this.groupeBoules);
+}
+
+// création pièces
+    this.groupe_pieces = this.physics.add.staticGroup();
+    // Récupère le calque objet
+    const calque_objets = carten4.getObjectLayer('calque_objet_4');
+
+    if (!calque_objets) {
+    console.error("Calque pièces introuvable !");
+} else {
+    calque_objets.objects.forEach(point => {
+        if (point.name == 'piecearamasser4') {
+            var nouvelle_piece = this.groupe_pieces.create(point.x, point.y, 'piece4');
+            nouvelle_piece.setScale(0.5);
+        }
+    });
+}
+
+    // PERMET DE RAMASSER LES PIECES
+    this.physics.add.overlap(this.player, this.groupe_pieces, this.ramasserPiece, null, this);
 
 
   }
@@ -223,6 +270,48 @@ this.physics.add.overlap(this.player, this.teleporter, this.finNiveau, null, thi
         this.player.setFlipY(true);
       }
     }
+
+    // attraction vers les boules
+    this.boules.forEach(boule => {
+    const dx = boule.x - this.player.x;
+    const dy = boule.y - this.player.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance < 400) {
+        const force = 2000 / distance;
+        this.player.setVelocityX(this.player.body.velocity.x + (dx / distance) * force);
+        this.player.setVelocityY(this.player.body.velocity.y + (dy / distance) * force);
+    }
+});
+// SAUT
+if (!this.gravityInverted) {
+    if (this.clavier.space.isDown && this.player.body.blocked.down) {
+        
+        // vérifie si une boule est proche
+        let bouleProcheFound = false;
+        this.boules.forEach(boule => {
+            const dx = boule.x - this.player.x;
+            const dy = boule.y - this.player.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < 400) {
+                bouleProcheFound = true;
+                // impulsion vers la boule
+                this.player.setVelocityX((dx / distance) * 1000);
+                this.player.setVelocityY((dy / distance) * 1000);
+            }
+        });
+
+        // saut normal si pas de boule proche
+        if (!bouleProcheFound) {
+            this.player.setVelocityY(-300);
+        }
+    }
+} else {
+    if (this.clavier.space.isDown && this.player.body.blocked.up) {
+        this.player.setVelocityY(300);
+    }
+}
   }
 
   
@@ -234,4 +323,9 @@ finNiveau(player, teleporter) {
   // retour tp menu principal
   this.scene.start('pageprincipale');
 }
+
+ramasserPiece(player, piece) {
+    piece.disableBody(true, true);
+    // Ici tu peux ajouter du code pour augmenter le score ou autre
+  }
 }
