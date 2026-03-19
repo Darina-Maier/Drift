@@ -116,18 +116,6 @@
                 }, 
                 {
                  "height":0,
-                 "id":7,
-                 "name":"ennemi3",
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":2354,
-                 "y":414
-                }, 
-                {
-                 "height":0,
                  "id":8,
                  "name":"ennemi3",
                  "point":true,
@@ -137,42 +125,6 @@
                  "width":0,
                  "x":2832,
                  "y":698
-                }, 
-                {
-                 "height":0,
-                 "id":9,
-                 "name":"ennemi3",
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":1820,
-                 "y":32
-                }, 
-                {
-                 "height":0,
-                 "id":10,
-                 "name":"ennemi3",
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":514,
-                 "y":34
-                }, 
-                {
-                 "height":0,
-                 "id":11,
-                 "name":"ennemi3",
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":588,
-                 "y":518
                 }, 
                 {
                  "height":0,
@@ -221,30 +173,6 @@
                  "width":0,
                  "x":2556,
                  "y":610
-                }, 
-                {
-                 "height":0,
-                 "id":16,
-                 "name":"ennemi3",
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":2670,
-                 "y":30
-                }, 
-                {
-                 "height":0,
-                 "id":17,
-                 "name":"ennemi3",
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":90,
-                 "y":120
                 }, 
                 {
                  "height":0,
@@ -371,7 +299,7 @@
                 {
                  "height":0,
                  "id":29,
-                 "name":"ami3",
+                 "name":"ennemi3",
                  "point":true,
                  "rotation":0,
                  "type":"",
@@ -383,7 +311,7 @@
                 {
                  "height":0,
                  "id":30,
-                 "name":"ami3",
+                 "name":"ennemi3",
                  "point":true,
                  "rotation":0,
                  "type":"",
@@ -395,7 +323,7 @@
                 {
                  "height":0,
                  "id":31,
-                 "name":"ami3",
+                 "name":"ennemi3",
                  "point":true,
                  "rotation":0,
                  "type":"",
@@ -406,20 +334,8 @@
                 }, 
                 {
                  "height":0,
-                 "id":32,
-                 "name":"ami3",
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":2058,
-                 "y":706
-                }, 
-                {
-                 "height":0,
                  "id":33,
-                 "name":"ami3",
+                 "name":"ennemi3",
                  "point":true,
                  "rotation":0,
                  "type":"",
@@ -427,30 +343,6 @@
                  "width":0,
                  "x":2222,
                  "y":192
-                }, 
-                {
-                 "height":0,
-                 "id":35,
-                 "name":"ami3",
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":1892,
-                 "y":478
-                }, 
-                {
-                 "height":0,
-                 "id":36,
-                 "name":"ami3",
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":558,
-                 "y":704
                 }],
          "opacity":1,
          "type":"objectgroup",

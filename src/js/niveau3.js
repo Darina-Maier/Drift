@@ -31,12 +31,8 @@ export default class niveau3 extends Phaser.Scene {
       frameWidth: 130,
       frameHeight: 90
     });
-
-    this.load.spritesheet('ennemi', 'src/assets/ennemi.png', {
-      frameWidth: 32,
-      frameHeight: 32
-    });
-    this.load.spritesheet('ami3', 'src/assets/ami3.png', {
+    
+    this.load.spritesheet('ennemi3', 'src/assets/ami3.png', {
       frameWidth: 100,  // 410 / 4 = ~102
       frameHeight: 156
     });
@@ -79,31 +75,17 @@ export default class niveau3 extends Phaser.Scene {
     this.player.setCollideWorldBounds(true);
     this.player.direction = 'droite';
 
-    // Animation ennemi
-    this.anims.create({
-      key: 'ennemi_droite',
-      frames: this.anims.generateFrameNumbers('ennemi', { start: 0, end: 8 }),
-      frameRate: 6,
-      repeat: -1
-    });
-    this.anims.create({
-      key: 'ennemi_gauche',
-      frames: this.anims.generateFrameNumbers('ennemi', { start: 3, end: 5 }),
-      frameRate: 6,
-      repeat: -1
-    });
 
-    // Animation ami3
+    // Animation ennemi3
     this.anims.create({
-      key: 'ami3_marche',
-      frames: this.anims.generateFrameNumbers('ami3', { start: 0, end: 3 }),
+      key: 'ennemi3_marche',
+      frames: this.anims.generateFrameNumbers('ennemi3', { start: 0, end: 3 }),
       frameRate: 10,
       repeat: -1
     });
 
     // Groupes pour ennemis et amis
     this.groupe_ennemis = this.physics.add.group();
-    this.groupe_amis = this.physics.add.group();
     // création pièces
     this.groupe_pieces = this.physics.add.staticGroup();
 
@@ -123,49 +105,30 @@ export default class niveau3 extends Phaser.Scene {
     // Ennemis qui marchent
     calque_objets.objects.forEach(point => {
       if (point.name == 'ennemi3') {
-        var ennemi = this.physics.add.sprite(point.x, point.y, 'ennemi');
-        ennemi.body.allowGravity = false; // ← ne change pas avec la gravité
-        ennemi.setDepth(100);
+
+        var ennemi = this.physics.add.sprite(point.x, point.y, 'ennemi3');
+        ennemi.setScale(0.4);
+        ennemi.setSize(70, 55);
+        ennemi.setOffset(10, 50);
         ennemi.setCollideWorldBounds(true);
-        ennemi.setBounceX(1);
-        ennemi.setVelocityX(-40);
-        ennemi.direction = 'gauche';
-        ennemi.anims.play('ennemi_gauche', true);
+        ennemi.setBounceX(0);
+        ennemi.setBounceY(0);
+        ennemi.anims.play('ennemi3_marche', true);
         this.groupe_ennemis.add(ennemi);
-      }
-    });
-
-    // Amis qui sautent
-    calque_objets.objects.forEach(point => {
-      if (point.name == 'ami3') {
-
-        var ami = this.physics.add.sprite(point.x, point.y, 'ami3');
-        ami.setScale(0.4);
-        ami.setSize(70, 55);
-        ami.setOffset(10, 50);
-        ami.setCollideWorldBounds(true);
-        ami.setBounceX(0);
-        ami.setBounceY(0);
-        ami.anims.play('ami3_marche', true);
-        this.groupe_amis.add(ami);
       }
     });
 
     // Collisions
     this.physics.add.collider(this.groupe_ennemis, calque_plateformes);
-    this.physics.add.collider(this.groupe_amis, calque_plateformes);
     this.physics.add.collider(this.groupe_pieces, calque_plateformes);
 
     // PERMET DE RAMASSER LES PIECES
     this.physics.add.overlap(this.player, this.groupe_pieces, ramasserPiece, null, this);
 
 
+   
     // Si joueur touche ennemi → restart
     this.physics.add.overlap(this.player, this.groupe_ennemis, () => {
-      this.scene.restart();
-    });
-    // Si joueur touche ami → restart
-    this.physics.add.overlap(this.player, this.groupe_amis, () => {
       this.scene.restart();
     });
 
@@ -258,44 +221,32 @@ export default class niveau3 extends Phaser.Scene {
       }
     }
 
-    this.groupe_ennemis.children.iterate((un_ennemi) => {
-      if (un_ennemi.direction == 'gauche') {
-        var coords = un_ennemi.getBottomLeft();
-        var tuileSuivante = this.calque_plateformes.getTileAtWorldXY(
-          coords.x, coords.y + 10
-        );
-        if (tuileSuivante == null || un_ennemi.body.blocked.left) {
-          un_ennemi.direction = 'droite';
-          un_ennemi.setVelocityX(40);
-          un_ennemi.anims.play('ennemi_droite', true);
-        }
-      } else if (un_ennemi.direction == 'droite') {
-        var coords = un_ennemi.getBottomRight();
-        var tuileSuivante = this.calque_plateformes.getTileAtWorldXY(
-          coords.x, coords.y + 10
-        );
-        if (tuileSuivante == null || un_ennemi.body.blocked.right) {
-          un_ennemi.direction = 'gauche';
-          un_ennemi.setVelocityX(-40);
-          un_ennemi.anims.play('ennemi_gauche', true);
-        }
-      }
-    });
+   
+    // ENNEMIS — sautent selon gravité
+    this.groupe_ennemis.children.iterate((ennemi) => {
+    this.orienterSprite(ennemi);
 
+    if (this.graviteDirection == 'bas' || this.graviteDirection == 'haut') {
+        // Gravité verticale → gravité normale + saut haut
+        ennemi.body.gravity.set(0, 0); // suit la gravité mondiale
+        if (this.graviteDirection == 'bas' && ennemi.body.blocked.down) {
+            if (Phaser.Math.Between(0, 100) < 5) { ennemi.setVelocityY(-350); }
+        } else if (this.graviteDirection == 'haut' && ennemi.body.blocked.up) {
+            if (Phaser.Math.Between(0, 100) < 5) { ennemi.setVelocityY(350); }
+        }
+    } else {
+        // Gravité horizontale → flotte très lentement
+        ennemi.body.gravity.set(0, 0);
+        ennemi.body.velocity.x = Phaser.Math.Linear(ennemi.body.velocity.x, 0, 0.05); // ralentit doucement
+        ennemi.body.velocity.y = Phaser.Math.Linear(ennemi.body.velocity.y, 0, 0.05); // flotte
 
-    // AMIS — sautent selon gravité
-    this.groupe_amis.children.iterate((ami) => {
-      this.orienterSprite(ami);
-      if (this.graviteDirection == 'bas' && ami.body.blocked.down) {
-        if (Phaser.Math.Between(0, 100) < 5) { ami.setVelocityY(-350); }
-      } else if (this.graviteDirection == 'haut' && ami.body.blocked.up) {
-        if (Phaser.Math.Between(0, 100) < 5) { ami.setVelocityY(350); }
-      } else if (this.graviteDirection == 'gauche' && ami.body.blocked.left) {
-        if (Phaser.Math.Between(0, 100) < 5) { ami.setVelocityX(350); }
-      } else if (this.graviteDirection == 'droite' && ami.body.blocked.right) {
-        if (Phaser.Math.Between(0, 100) < 5) { ami.setVelocityX(-350); }
-      }
-    });
+        // Légère dérive aléatoire très lente
+        if (Phaser.Math.Between(0, 200) < 1) {
+            ennemi.setVelocityX(Phaser.Math.Between(-30, 30));
+            ennemi.setVelocityY(Phaser.Math.Between(-30, 30));
+        }
+    }
+});
   }
 
 
