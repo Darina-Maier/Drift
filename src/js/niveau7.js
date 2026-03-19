@@ -21,6 +21,17 @@ export default class niveau7 extends Phaser.Scene {
 
     this.load.image("bg7", "src/assets/tuilesn7/background_n7.png");
     this.load.image("t7", "src/assets/tuilesn7/Tileset_n7.png");
+
+    // chargement des 9 images du téléporteur
+    this.load.image('tp01', 'src/assets/teleporter/tp01.png');
+    this.load.image('tp02', 'src/assets/teleporter/tp02.png');
+    this.load.image('tp03', 'src/assets/teleporter/tp03.png');
+    this.load.image('tp04', 'src/assets/teleporter/tp04.png');
+    this.load.image('tp05', 'src/assets/teleporter/tp05.png');
+    this.load.image('tp06', 'src/assets/teleporter/tp06.png');
+    this.load.image('tp07', 'src/assets/teleporter/tp07.png');
+    this.load.image('tp08', 'src/assets/teleporter/tp08.png');
+    this.load.image('tp09', 'src/assets/teleporter/tp09.png');
     
     // chargement de la carte
     this.load.tilemapTiledJSON("carte7", "src/assets/map_n7.json"); 
@@ -60,7 +71,7 @@ export default class niveau7 extends Phaser.Scene {
     calque_plateformes7.setCollisionByProperty({ estSolide: true });
     calque_plateformes7.setCollisionByProperty({ estsolide: true });
 
-    this.player = this.physics.add.sprite(100, 450, 'astronaut');
+    this.player = this.physics.add.sprite(300, 300, 'astronaut');
     this.player.setSize(50, 70);
     this.player.setOffset(36, 10);
     this.player.setCollideWorldBounds(true);
@@ -102,6 +113,36 @@ export default class niveau7 extends Phaser.Scene {
     })
 
     this.toucheGravite = this.input.keyboard.addKey('G');
+
+    // animation du téléporteur avec les 9 images
+this.anims.create({
+  key: 'anim_teleporter',
+  frames: [
+    { key: 'tp01' },
+    { key: 'tp02' },
+    { key: 'tp03' },
+    { key: 'tp04' },
+    { key: 'tp05' },
+    { key: 'tp06' },
+    { key: 'tp07' },
+    { key: 'tp08' },
+    { key: 'tp09' }
+  ],
+  frameRate: 10, // vitesse de rotation
+  repeat: -1     // boucle infinie
+});
+
+// création tp fin du niveau
+this.teleporter = this.physics.add.sprite(3020, 300, 'tp01');
+this.teleporter.body.allowGravity = false;
+this.teleporter.setImmovable(true);
+
+// animation en boucle 
+this.teleporter.anims.play('anim_teleporter');
+this.teleporter.setScale(0.3);
+this.teleporter.setSize(150,200);
+this.physics.add.overlap(this.player, this.teleporter, this.finNiveau, null, this);
+
   }
 
   update() {
@@ -145,5 +186,15 @@ this.gravityInverted = false;
 }
   }
     }
+
+    finNiveau(player, teleporter) {
+
+  // optionnel : désactiver le joueur pour éviter multi déclenchement
+  player.setVelocity(0);
+  player.disableBody(true, true);
+
+  // retour tp menu principal
+  this.scene.start('pageprincipale');
+}
   }
 
