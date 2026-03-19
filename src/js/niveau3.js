@@ -1,4 +1,3 @@
-
 /***********************************************************************/
 /** VARIABLES GLOBALES 
 /***********************************************************************/
@@ -10,10 +9,9 @@ export default class niveau3 extends Phaser.Scene {
   // constructeur de la classe
   constructor() {
     super({
-      key: "niveau3" //  ici on précise le nom de la classe en tant qu'identifiant
+      key: "niveau3" // ici on précise le nom de la classe en tant qu'identifiant
     });
   }
-
 
   preload() {
     this.load.audio("musiqueNiveau3", "src/assets/sons/niveau3.ogg");
@@ -34,7 +32,6 @@ export default class niveau3 extends Phaser.Scene {
     this.load.image('tp08', 'src/assets/teleporter/tp08.png');
     this.load.image('tp09', 'src/assets/teleporter/tp09.png');
 
-
     this.load.spritesheet('astronaut', 'src/assets/astronaut.png', {
       frameWidth: 130,
       frameHeight: 90
@@ -43,14 +40,13 @@ export default class niveau3 extends Phaser.Scene {
       frameWidth: 130,
       frameHeight: 90
     });
-    
+
     this.load.spritesheet('ennemi3', 'src/assets/ami3.png', {
-      frameWidth: 100,  // 410 / 4 = ~102
+      frameWidth: 100,
       frameHeight: 156
     });
 
     this.load.image('piece3', 'src/assets/elemn3/en31.png');
-
   }
 
   create() {
@@ -62,7 +58,6 @@ export default class niveau3 extends Phaser.Scene {
       loop: true,
       volume: 0.5
     });
-
     this.musiqueNiveau3.play();
 
     const carten3 = this.add.tilemap("carte");
@@ -76,16 +71,14 @@ export default class niveau3 extends Phaser.Scene {
     const calque_plateformes = carten3.createLayer("calque_plateform_alien", tilesets);
 
     // Collision sur les tuiles solides
-
     calque_plateformes.setCollisionByProperty({ estsolide: true });
 
     // création du joueur
-    this.player = this.physics.add.sprite(220, 200, 'astronaut');
+    this.player = this.physics.add.sprite(2950, 200, 'astronaut');
     this.player.setSize(50, 70);
     this.player.setOffset(36, 10);
     this.player.setCollideWorldBounds(true);
     this.player.direction = 'droite';
-
 
     // Animation ennemi3
     this.anims.create({
@@ -95,11 +88,10 @@ export default class niveau3 extends Phaser.Scene {
       repeat: -1
     });
 
-    // Groupes pour ennemis et amis
+    // Groupes pour ennemis et pièces
     this.groupe_ennemis = this.physics.add.group();
     // création pièces
     this.groupe_pieces = this.physics.add.staticGroup();
-
 
     // Récupère le calque objet
     const calque_objets = carten3.getObjectLayer('calque_objet3');
@@ -116,7 +108,6 @@ export default class niveau3 extends Phaser.Scene {
     // Ennemis qui marchent
     calque_objets.objects.forEach(point => {
       if (point.name == 'ennemi3') {
-
         var ennemi = this.physics.add.sprite(point.x, point.y, 'ennemi3');
         ennemi.setScale(0.4);
         ennemi.setSize(70, 55);
@@ -134,10 +125,8 @@ export default class niveau3 extends Phaser.Scene {
     this.physics.add.collider(this.groupe_pieces, calque_plateformes);
 
     // PERMET DE RAMASSER LES PIECES
-    this.physics.add.overlap(this.player, this.groupe_pieces, ramasserPiece, null, this);
+    this.physics.add.overlap(this.player, this.groupe_pieces, this.ramasserPiece, null, this);
 
-
-   
     // Si joueur touche ennemi → restart
     this.physics.add.overlap(this.player, this.groupe_ennemis, () => {
       this.scene.restart();
@@ -152,45 +141,51 @@ export default class niveau3 extends Phaser.Scene {
     this.cameras.main.startFollow(this.player);
     this.physics.world.setBounds(0, 0, 3072, 768); // ← même dimensions que la caméra
 
-    //touches definies
+    // touches définies
     this.toucheGravite = this.input.keyboard.addKey('G');
     this.graviteDirection = 'bas'; // démarre vers le bas
     this.physics.world.gravity.set(0, 300);
     boutoncourir = this.input.keyboard.addKey('C');
 
     // animation du téléporteur avec les 9 images
-this.anims.create({
-  key: 'anim_teleporter',
-  frames: [
-    { key: 'tp01' },
-    { key: 'tp02' },
-    { key: 'tp03' },
-    { key: 'tp04' },
-    { key: 'tp05' },
-    { key: 'tp06' },
-    { key: 'tp07' },
-    { key: 'tp08' },
-    { key: 'tp09' }
-  ],
-  frameRate: 10, // vitesse de rotation
-  repeat: -1     // boucle infinie
-});
+    this.anims.create({
+      key: 'anim_teleporter',
+      frames: [
+        { key: 'tp01' }, { key: 'tp02' }, { key: 'tp03' },
+        { key: 'tp04' }, { key: 'tp05' }, { key: 'tp06' },
+        { key: 'tp07' }, { key: 'tp08' }, { key: 'tp09' }
+      ],
+      frameRate: 10, // vitesse de rotation
+      repeat: -1     // boucle infinie
+    });
 
-// création tp fin du niveau
-this.teleporter = this.physics.add.sprite(3010, 320, 'tp01');
-this.teleporter.body.allowGravity = false;
-this.teleporter.setImmovable(true);
+    // création tp fin du niveau
+    this.teleporter = this.physics.add.sprite(3010, 320, 'tp01');
+    this.teleporter.body.allowGravity = false;
+    this.teleporter.setImmovable(true);
 
-// animation en boucle 
-this.teleporter.anims.play('anim_teleporter');
-this.teleporter.setScale(0.3);
-this.teleporter.setSize(90,200);
-this.physics.add.overlap(this.player, this.teleporter, this.finNiveau, null, this);
+    // animation en boucle
+    this.teleporter.anims.play('anim_teleporter');
+    this.teleporter.setScale(0.3);
+    this.teleporter.setSize(90, 200);
+    this.physics.add.overlap(this.player, this.teleporter, this.finNiveau, null, this);
 
+    // flag niveau complet
+    this.niveauComplete = false;
   }
 
-
   update() {
+    // touche triche : T = ramasse toutes les pièces sans valider le niveau
+    if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('T'))) {
+      this.groupe_pieces.getChildren().forEach(piece => {
+        piece.disableBody(true, true);
+      });
+      // vérifie si toutes les pièces sont ramassées
+      if (this.groupe_pieces.countActive() === 0) {
+        this.niveauComplete = true;
+      }
+    }
+
     // DÉPLACEMENTS joueur
     if (this.graviteDirection == 'bas' || this.graviteDirection == 'haut') {
       if (boutoncourir.isDown && this.clavier.right.isDown) {
@@ -262,35 +257,28 @@ this.physics.add.overlap(this.player, this.teleporter, this.finNiveau, null, thi
       }
     }
 
-   
     // ENNEMIS — sautent selon gravité
     this.groupe_ennemis.children.iterate((ennemi) => {
-    this.orienterSprite(ennemi);
+      this.orienterSprite(ennemi);
 
-    if (this.graviteDirection == 'bas' || this.graviteDirection == 'haut') {
-        // Gravité verticale → gravité normale + saut haut
-        ennemi.body.gravity.set(0, 0); // suit la gravité mondiale
-        if (this.graviteDirection == 'bas' && ennemi.body.blocked.down) {
-            if (Phaser.Math.Between(0, 100) < 5) { ennemi.setVelocityY(-350); }
-        } else if (this.graviteDirection == 'haut' && ennemi.body.blocked.up) {
-            if (Phaser.Math.Between(0, 100) < 5) { ennemi.setVelocityY(350); }
-        }
-    } else {
-        // Gravité horizontale → flotte très lentement
+      if (this.graviteDirection == 'bas' || this.graviteDirection == 'haut') {
         ennemi.body.gravity.set(0, 0);
-        ennemi.body.velocity.x = Phaser.Math.Linear(ennemi.body.velocity.x, 0, 0.05); // ralentit doucement
-        ennemi.body.velocity.y = Phaser.Math.Linear(ennemi.body.velocity.y, 0, 0.05); // flotte
-
-        // Légère dérive aléatoire très lente
-        if (Phaser.Math.Between(0, 200) < 1) {
-            ennemi.setVelocityX(Phaser.Math.Between(-30, 30));
-            ennemi.setVelocityY(Phaser.Math.Between(-30, 30));
+        if (this.graviteDirection == 'bas' && ennemi.body.blocked.down) {
+          if (Phaser.Math.Between(0, 100) < 5) { ennemi.setVelocityY(-350); }
+        } else if (this.graviteDirection == 'haut' && ennemi.body.blocked.up) {
+          if (Phaser.Math.Between(0, 100) < 5) { ennemi.setVelocityY(350); }
         }
-    }
-});
+      } else {
+        ennemi.body.gravity.set(0, 0);
+        ennemi.body.velocity.x = Phaser.Math.Linear(ennemi.body.velocity.x, 0, 0.05);
+        ennemi.body.velocity.y = Phaser.Math.Linear(ennemi.body.velocity.y, 0, 0.05);
+        if (Phaser.Math.Between(0, 200) < 1) {
+          ennemi.setVelocityX(Phaser.Math.Between(-30, 30));
+          ennemi.setVelocityY(Phaser.Math.Between(-30, 30));
+        }
+      }
+    });
   }
-
-
 
   orienterSprite(obj) {
     if (this.graviteDirection == 'bas') {
@@ -305,19 +293,30 @@ this.physics.add.overlap(this.player, this.teleporter, this.finNiveau, null, thi
   }
 
   finNiveau(player, teleporter) {
+    // optionnel : désactiver le joueur pour éviter multi déclenchement
+    player.setVelocity(0);
+    player.disableBody(true, true);
 
-  // optionnel : désactiver le joueur pour éviter multi déclenchement
-  player.setVelocity(0);
-  player.disableBody(true, true);
+    // on ne valide que si toutes les pièces ont été ramassées
+    if (this.niveauComplete) {
+      let niveauxFinis = this.game.registry.get('niveauxFinis');
+      if (!niveauxFinis.includes('niveau3')) {
+        niveauxFinis.push('niveau3');
+        this.game.registry.set('niveauxFinis', niveauxFinis);
+      }
+    }
 
-  // retour tp menu principal
-  this.scene.start('pageprincipale');
+    // retour tp menu principal
+    if (this.musiqueNiveau3) this.musiqueNiveau3.stop();
+    this.scene.start('pageprincipale');
+  }
+
+  ramasserPiece(player, piece) {
+    piece.disableBody(true, true);
+
+    // si toutes les pièces sont ramassées → niveau complet
+    if (this.groupe_pieces.countActive() === 0) {
+      this.niveauComplete = true;
+    }
+  }
 }
-
-}
-
-function ramasserPiece(player, piece) {
-  piece.disableBody(true, true);
-  // Ici tu peux ajouter du code pour augmenter le score ou autre
-}
-

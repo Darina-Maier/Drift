@@ -3,42 +3,43 @@
 /***********************************************************************/
 var player;
 var clavier;
+var boutonFeu;
+var groupeBullets;
 
-export default class niveau6 extends Phaser.Scene {
-
+export default class niveau5 extends Phaser.Scene {
+  // constructeur de la classe
   constructor() {
     super({
-      key: "niveau6"
+      key: "niveau5" // ici on précise le nom de la classe en tant qu'identifiant
     });
   }
 
   preload() {
-    this.load.audio("musiqueNiveau6", "src/assets/sons/niveau6.ogg");
-    this.load.image("bg6", "src/assets/tuilesn6/2_game_background.png");
-    this.load.image("t6", "src/assets/tuilesn6/alien-planet-tileset.png");
+    this.load.audio("musiqueNiveau5", "src/assets/sons/niveau5.ogg");
+    this.load.image("bg5", "src/assets/tuilesn5/background_n5.png");
+    this.load.image("t5", "src/assets/tuilesn5/Tileset_n5.png");
+    // chargement piece5
+    this.load.image('piece5', 'src/assets/tuilesn5/piece5.png');
 
-    // carte
-    this.load.tilemapTiledJSON("carte6", "src/assets/map_n6.json");
+    // chargement de la carte
+    this.load.tilemapTiledJSON("carte5", "src/assets/map_n5.json");
 
-    // joueur
-    this.load.spritesheet("astronaut", "src/assets/astronaut.png", {
+    this.load.spritesheet('astronaut', 'src/assets/astronaut.png', {
+      frameWidth: 130,
+      frameHeight: 90
+    });
+    this.load.spritesheet('astronautinverse', 'src/assets/astronautinverse.png', {
       frameWidth: 130,
       frameHeight: 90
     });
 
-    this.load.spritesheet("astronautinverse", "src/assets/astronautinverse.png", {
-      frameWidth: 130,
-      frameHeight: 90
+    // chargement meteorite
+    this.load.spritesheet('meteorites', 'src/assets/tuilesn5/meteorite.png', {
+      frameWidth: 250,
+      frameHeight: 250
     });
-
-    // ennemi
-    this.load.spritesheet("fishrobot", "src/assets/fishrobot.png", {
-      frameWidth: 41,
-      frameHeight: 61
-    });
-
-    // pièce
-    this.load.image("piece", "src/assets/piece.png");
+    // chargement tir
+    this.load.image("bullet", "src/assets/tuilesn5/balle.png");
 
     // chargement des 9 images du téléporteur
     this.load.image('tp01', 'src/assets/teleporter/tp01.png');
@@ -53,295 +54,192 @@ export default class niveau6 extends Phaser.Scene {
   }
 
   create() {
-    this.estMort = false;
-    this.gravityInverted = false;
-    this.vies = 3;
-    this.invulnerable = false;
-    this.score = 0;
-
+    // stoppe les anciennes musiques
     this.sound.stopAll();
 
-    this.musiqueNiveau6 = this.sound.add("musiqueNiveau6", {
+    // lance la musique du niveau 5
+    this.musiqueNiveau5 = this.sound.add("musiqueNiveau5", {
       loop: true,
       volume: 0.5
     });
-    this.musiqueNiveau6.play();
+    this.musiqueNiveau5.play();
 
-    // création de la map
-    const carten6 = this.make.tilemap({ key: "carte6" });
+    const carten5 = this.add.tilemap("carte5");
 
-    const ts_bg6 = carten6.addTilesetImage("niveau6", "bg6");
-    const ts_t6 = carten6.addTilesetImage("alien-planet-tileset", "t6");
-    const tilesets = [ts_bg6, ts_t6];
+    // chargement du jeu de tuiles
+    const ts_bg5 = carten5.addTilesetImage("background_n5", "bg5");
+    const ts_t5 = carten5.addTilesetImage("plateforme_n5", "t5");
+    const tilesets = [ts_bg5, ts_t5];
 
-    const calque_background6 = carten6.createLayer("calque_background_niveau6", tilesets, 0, 0);
-    const calque_plateformes6 = carten6.createLayer("calque_platform_n6", tilesets, 0, 0);
+    const calque_background5 = carten5.createLayer("calque_background_n5", tilesets);
+    const calque_plateformes5 = carten5.createLayer("calque_plateformes_n5", tilesets);
 
-    calque_plateformes6.setCollisionByProperty({ estsolide: true });
-    calque_plateformes6.setCollisionByProperty({ estSolide: true });
+    // Collision sur les tuiles solides
+    calque_plateformes5.setCollisionByProperty({ estSolide: true });
+    calque_plateformes5.setCollisionByProperty({ estsolide: true });
 
-    // joueur
-    this.player = this.physics.add.sprite(100, 450, "astronaut");
+    this.player = this.physics.add.sprite(2950, 0, 'astronaut');
     this.player.setSize(50, 70);
     this.player.setOffset(36, 10);
     this.player.setCollideWorldBounds(true);
-    this.player.direction = "droite";
-
-    this.spawnX = 100;
-    this.spawnY = 450;
+    this.player.direction = 'droite';
 
     this.clavier = this.input.keyboard.createCursorKeys();
-    this.toucheGravite = this.input.keyboard.addKey("G");
-
-    this.physics.add.collider(this.player, calque_plateformes6);
-
-    // caméra
+    this.physics.add.collider(this.player, calque_plateformes5);
     this.cameras.main.setBounds(0, 0, 3072, 768);
     this.cameras.main.startFollow(this.player);
-    this.physics.world.setBounds(0, 0, 3072, 768);
+    this.physics.world.setBounds(0, 0, 3072, 768); // ← même dimensions que la caméra
 
-    // texte vies
-    this.texteVies = this.add.text(20, 20, "Vies : 3", {
-      fontSize: "24px",
-      fill: "#ffffff"
+    // animations
+    this.anims.create({
+      key: 'anim_droite',
+      frames: this.anims.generateFrameNumbers('astronaut', { start: 0, end: 3 }),
+      frameRate: 10,
+      repeat: -1
     });
-    this.texteVies.setScrollFactor(0);
-
-    // texte score
-    this.texteScore = this.add.text(20, 50, "Pièces : 0", {
-      fontSize: "24px",
-      fill: "#ffff00"
+    this.anims.create({
+      key: 'anim_gauche',
+      frames: this.anims.generateFrameNumbers('astronautinverse', { start: 0, end: 3 }),
+      frameRate: 10,
+      repeat: -1
     });
-    this.texteScore.setScrollFactor(0);
+    this.anims.create({
+      key: 'immobiledroit',
+      frames: [{ key: 'astronaut', frame: 21 }],
+      frameRate: 1
+    });
+    this.anims.create({
+      key: 'immobilegauche',
+      frames: [{ key: 'astronautinverse', frame: 21 }],
+      frameRate: 1
+    });
+    this.anims.create({
+      key: 'sautdroit',
+      frames: this.anims.generateFrameNumbers('astronaut', { start: 30, end: 35 }),
+      frameRate: 10
+    });
 
-    /***********************************************************************/
-    /** PIECES
-    /***********************************************************************/
-    this.groupe_pieces = this.physics.add.group();
+    // création du groupe des météorites
+    this.groupeMeteorites = this.physics.add.group();
 
-    const calque_objets = carten6.getObjectLayer("piece_a_ramasse_n6");
+    this.time.addEvent({
+      delay: 2000,
+      callback: this.creerMeteorite,
+      callbackScope: this,
+      loop: true
+    });
 
-    if (calque_objets) {
-      calque_objets.objects.forEach((point) => {
-        if (point.name === "piece") {
-          let nouvelle_piece = this.physics.add.sprite(point.x, point.y, "piece");
+    // affectation de la touche A au tir
+    boutonFeu = this.input.keyboard.addKey('A');
+
+    // création du groupe des balles
+    groupeBullets = this.physics.add.group();
+
+    this.clavier = this.input.keyboard.createCursorKeys();
+
+    this.physics.world.on("worldbounds", function(body) {
+      var objet = body.gameObject;
+      if (groupeBullets.contains(objet)) {
+        objet.destroy();
+      }
+    });
+
+    this.anims.create({
+      key: 'tir_droite',
+      frames: this.anims.generateFrameNumbers('astronaut', { start: 34, end: 35 }),
+      frameRate: 10,
+      repeat: 0
+    });
+    this.anims.create({
+      key: 'tir_gauche',
+      frames: this.anims.generateFrameNumbers('astronautinverse', { start: 31, end: 30 }),
+      frameRate: 10,
+      repeat: 0
+    });
+
+    this.isTir = false;
+    // collision entre les balles et les météorites
+    this.physics.add.overlap(groupeBullets, this.groupeMeteorites, this.hitMeteorite, null, this);
+    this.vies = 3;
+    // contact joueur meteorite
+    this.physics.add.overlap(this.player, this.groupeMeteorites, this.toucheMeteorite, null, this);
+
+    this.toucheGravite = this.input.keyboard.addKey('G');
+
+    // animation du téléporteur avec les 9 images
+    this.anims.create({
+      key: 'anim_teleporter',
+      frames: [
+        { key: 'tp01' }, { key: 'tp02' }, { key: 'tp03' },
+        { key: 'tp04' }, { key: 'tp05' }, { key: 'tp06' },
+        { key: 'tp07' }, { key: 'tp08' }, { key: 'tp09' }
+      ],
+      frameRate: 10, // vitesse de rotation
+      repeat: -1     // boucle infinie
+    });
+
+    // création tp fin du niveau
+    this.teleporter = this.physics.add.sprite(3020, 620, 'tp01');
+    this.teleporter.body.allowGravity = false;
+    this.teleporter.setImmovable(true);
+
+    // animation en boucle
+    this.teleporter.anims.play('anim_teleporter');
+    this.teleporter.setScale(0.3);
+    this.teleporter.setSize(50, 200);
+    this.physics.add.overlap(this.player, this.teleporter, this.finNiveau, null, this);
+
+    // création pièces
+    this.groupe_pieces = this.physics.add.staticGroup();
+    // Récupère le calque objet
+    const calque_objets = carten5.getObjectLayer('calque_objet5');
+
+    if (!calque_objets) {
+      console.error("Calque pièces introuvable !");
+    } else {
+      calque_objets.objects.forEach(point => {
+        if (point.name == 'piecearamasser5') {
+          var nouvelle_piece = this.groupe_pieces.create(point.x, point.y, 'piece5');
           nouvelle_piece.setScale(0.5);
-          nouvelle_piece.setImmovable(false);
-          this.groupe_pieces.add(nouvelle_piece);
         }
       });
     }
 
-    // les pièces collisionnent avec les plateformes
-    this.physics.add.collider(this.groupe_pieces, calque_plateformes6);
-
+    // PERMET DE RAMASSER LES PIECES
     this.physics.add.overlap(this.player, this.groupe_pieces, this.ramasserPiece, null, this);
 
-    /***********************************************************************/
-    /** ANIMATIONS JOUEUR
-    /***********************************************************************/
-    if (!this.anims.exists("anim_droite")) {
-      this.anims.create({
-        key: "anim_droite",
-        frames: this.anims.generateFrameNumbers("astronaut", { start: 0, end: 3 }),
-        frameRate: 10,
-        repeat: -1
-      });
-    }
-
-    if (!this.anims.exists("anim_gauche")) {
-      this.anims.create({
-        key: "anim_gauche",
-        frames: this.anims.generateFrameNumbers("astronautinverse", { start: 0, end: 3 }),
-        frameRate: 10,
-        repeat: -1
-      });
-    }
-
-    if (!this.anims.exists("immobiledroit")) {
-      this.anims.create({
-        key: "immobiledroit",
-        frames: [{ key: "astronaut", frame: 21 }],
-        frameRate: 1
-      });
-    }
-
-    if (!this.anims.exists("immobilegauche")) {
-      this.anims.create({
-        key: "immobilegauche",
-        frames: [{ key: "astronautinverse", frame: 21 }],
-        frameRate: 1
-      });
-    }
-
-    if (!this.anims.exists("sautdroit")) {
-      this.anims.create({
-        key: "sautdroit",
-        frames: this.anims.generateFrameNumbers("astronaut", { start: 30, end: 35 }),
-        frameRate: 10
-      });
-    }
-
-    /***********************************************************************/
-    /** ANIMATION ENNEMI
-    /***********************************************************************/
-    if (!this.anims.exists("anim_fishrobot")) {
-      this.anims.create({
-        key: "anim_fishrobot",
-        frames: this.anims.generateFrameNumbers("fishrobot", { start: 0, end: 2 }),
-        frameRate: 6,
-        repeat: -1
-      });
-    }
-
-    /***********************************************************************/
-    /** POISSONS
-    /***********************************************************************/
-    this.poissons = [];
-    const nbPoissons = 6;
-
-    for (let i = 0; i < nbPoissons; i++) {
-      const posX = Phaser.Math.Between(200, 2800);
-      const posY = Phaser.Math.Between(150, 600);
-
-      const poisson = this.physics.add.sprite(posX, posY, "fishrobot");
-
-      poisson.anims.play("anim_fishrobot", true);
-      poisson.setCollideWorldBounds(true);
-      poisson.body.allowGravity = false;
-      poisson.setSize(30, 40);
-      poisson.setOffset(5, 10);
-      poisson.vivant = true;
-
-      const distance = Phaser.Math.Between(200, 500);
-      const duree = Phaser.Math.Between(3000, 5000);
-      const targetX = Phaser.Math.Clamp(posX + distance, 100, 3000);
-
-      this.tweens.add({
-        targets: poisson,
-        x: targetX,
-        duration: duree,
-        yoyo: true,
-        repeat: -1
-      });
-
-      this.poissons.push(poisson);
-
-      this.physics.add.overlap(this.player, poisson, this.toucherPoisson, null, this);
-    }
-
-    /***********************************************************************/
-    /** TELEPORTEUR
-    /***********************************************************************/
-    // animation du téléporteur avec les 9 images
-    if (!this.anims.exists('anim_teleporter')) {
-      this.anims.create({
-        key: 'anim_teleporter',
-        frames: [
-          { key: 'tp01' },
-          { key: 'tp02' },
-          { key: 'tp03' },
-          { key: 'tp04' },
-          { key: 'tp05' },
-          { key: 'tp06' },
-          { key: 'tp07' },
-          { key: 'tp08' },
-          { key: 'tp09' }
-        ],
-        frameRate: 10,
-        repeat: -1
-      });
-    }
-
-    // création du téléporteur à la fin du niveau
-    this.teleporter = this.physics.add.sprite(3020, 380, 'tp01');
-    this.teleporter.body.allowGravity = false;
-    this.teleporter.setImmovable(true);
-    this.teleporter.anims.play('anim_teleporter');
-    this.teleporter.setScale(0.3);
-    this.teleporter.setSize(150, 200);
-
-    this.physics.add.overlap(this.player, this.teleporter, this.finNiveau, null, this);
-  }
-
-  ramasserPiece(player, piece) {
-    piece.destroy();
-    this.score++;
-    this.texteScore.setText("Pièces : " + this.score);
-  }
-
-  finNiveau(player, teleporter) {
-    // Arrête la musique et redémarre la scène principale
-    if (this.musiqueNiveau6) {
-      this.musiqueNiveau6.stop();
-    }
-    this.scene.start('pageprincipale');
-  }
-
-  toucherPoisson(player, poisson) {
-    if (player.body.velocity.y > 0 && player.y < poisson.y) {
-      if (poisson.vivant) {
-        poisson.vivant = false;
-        poisson.destroy();
-        this.player.setVelocityY(-250);
-      }
-    } else {
-      this.perdre();
-    }
-  }
-
-  perdre() {
-    if (this.invulnerable || this.estMort) return;
-
-    this.invulnerable = true;
-    this.vies--;
-
-    this.texteVies.setText("Vies : " + this.vies);
-
-    if (this.vies <= 0) {
-      this.estMort = true;
-      this.physics.pause();
-      this.player.setTint(0xff0000);
-
-      if (this.musiqueNiveau6) {
-        this.musiqueNiveau6.stop();
-      }
-
-      this.time.delayedCall(1000, () => {
-        this.scene.restart();
-      });
-
-      return;
-    }
-
-    this.player.setPosition(this.spawnX, this.spawnY);
-    this.player.setVelocity(0, 0);
-
-    this.time.delayedCall(1000, () => {
-      this.invulnerable = false;
-    });
+    // flag niveau complet
+    this.niveauComplete = false;
   }
 
   update() {
-    if (this.estMort) return;
-
-    if (this.clavier.right.isDown) {
-      this.player.setVelocityX(160);
-      this.player.direction = "droite";
-      this.player.anims.play("anim_droite", true);
+    // touche triche : T = ramasse toutes les pièces sans valider le niveau
+    if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('T'))) {
+      this.groupe_pieces.getChildren().forEach(piece => {
+        piece.disableBody(true, true);
+      });
+      // vérifie si toutes les pièces sont ramassées
+      if (this.groupe_pieces.countActive() === 0) {
+        this.niveauComplete = true;
+      }
     }
-    else if (this.clavier.left.isDown) {
-      this.player.setVelocityX(-160);
-      this.player.direction = "gauche";
-      this.player.anims.play("anim_gauche", true);
-    }
-    else {
-      this.player.setVelocityX(0);
 
-      if (this.player.direction === "droite") {
-        this.player.anims.play("immobiledroit", true);
+    if (!this.isTir) {
+      if (this.clavier.right.isDown) {
+        this.player.setVelocityX(160);
+        this.player.direction = 'droite';
+        this.player.anims.play('anim_droite', true);
+      } else if (this.clavier.left.isDown) {
+        this.player.setVelocityX(-160);
+        this.player.direction = 'gauche';
+        this.player.anims.play('anim_gauche', true);
       } else {
-        this.player.anims.play("immobilegauche", true);
+        this.player.setVelocityX(0);
+        if (this.player.direction == 'droite') {
+          this.player.anims.play('immobiledroit', true);
+        } else {
+          this.player.anims.play('immobilegauche', true);
+        }
       }
     }
 
@@ -350,22 +248,137 @@ export default class niveau6 extends Phaser.Scene {
     }
 
     if (Phaser.Input.Keyboard.JustDown(this.clavier.up)) {
-      if (this.musiqueNiveau6) {
-        this.musiqueNiveau6.stop();
-      }
-      this.scene.start("pageprincipale");
+      if (this.musiqueNiveau5) this.musiqueNiveau5.stop();
+      this.scene.start('pageprincipale');
     }
 
-    if (Phaser.Input.Keyboard.JustDown(this.toucheGravite)) {
-      if (this.gravityInverted === false) {
-        this.gravityInverted = true;
-        this.player.body.gravity.y = -1200;
-        this.player.setFlipY(true);
+    if (Phaser.Input.Keyboard.JustDown(boutonFeu)) {
+      this.isTir = true;
+
+      if (this.player.direction == 'droite') {
+        this.player.anims.play('tir_droite');
       } else {
-        this.gravityInverted = false;
-        this.player.body.gravity.y = 0;
-        this.player.setFlipY(false);
+        this.player.anims.play('tir_gauche');
       }
+
+      this.tirer(this.player);
+
+      this.time.delayedCall(300, () => {
+        this.isTir = false;
+      });
+    }
+
+    // appuie sur G pour changer la gravité
+    if (Phaser.Input.Keyboard.JustDown(this.toucheGravite)) {
+      if (this.gravityInverted == true) {
+        this.player.body.gravity.y = -600;  // gravité vers le bas
+        this.gravityInverted = false;
+        // this.physics.world.gravity.y = -200; // gravité vers le haut
+        this.player.setFlipY(true); // retourne le sprite du joueur
+      } else {
+        this.gravityInverted = true;
+        this.player.body.gravity.y = 0;  // gravité vers le bas
+        this.player.setFlipY(false); // remet le sprite du joueur à l'endroit
+      }
+    }
+  }
+
+  creerMeteorite() {
+    let frameAleatoire = Phaser.Math.Between(0, 3);
+    let xAleatoire = Phaser.Math.Between(this.player.x - 300, this.player.x + 300);
+    xAleatoire = Phaser.Math.Clamp(xAleatoire, 50, 3000);
+    let meteorite = this.groupeMeteorites.create(xAleatoire, this.player.y - 400, 'meteorites', frameAleatoire);
+
+    meteorite.body.allowGravity = false;
+    meteorite.setVelocityY(20);
+    meteorite.setVelocityX(Phaser.Math.Between(-30, 30));
+    meteorite.setBounce(0);
+    meteorite.setScale(0.3);
+    meteorite.setSize(100, 100);
+  }
+
+  tirer(player) {
+    let coefDir;
+
+    if (player.direction == 'gauche') {
+      coefDir = -1;
+    } else {
+      coefDir = 1;
+    }
+
+    // création de la balle à côté du joueur
+    let bullet = groupeBullets.create(player.x + (25 * coefDir), player.y - 4, 'bullet');
+
+    bullet.setScale(0.5);
+    bullet.setSize(50, 50);
+    bullet.body.allowGravity = false;
+    bullet.setCollideWorldBounds(true);
+    bullet.body.onWorldBounds = true;
+
+    // vitesse de la balle
+    bullet.setVelocity(700 * coefDir, 0);
+  }
+
+  hitMeteorite(bullet, meteorite) {
+    // destruction de la balle
+    bullet.destroy();
+
+    // destruction de la météorite
+    meteorite.destroy();
+  }
+
+  toucheMeteorite(player, meteorite) {
+    // destruction de la météorite
+    meteorite.destroy();
+
+    // le joueur perd une vie
+    this.vies--;
+
+    // effet visuel rouge
+    player.setTint(0xff0000);
+
+    // petit recul
+    player.setVelocityY(-200);
+
+    // enlève la teinte rouge après un court instant
+    this.time.delayedCall(200, () => {
+      player.clearTint();
+    });
+
+    // affiche le nombre de vies restant dans la console
+    console.log("Vies restantes :", this.vies);
+
+    // si le joueur n'a plus de vie
+    if (this.vies <= 0) {
+      this.scene.restart();
+    }
+  }
+
+  finNiveau(player, teleporter) {
+    // optionnel : désactiver le joueur pour éviter multi déclenchement
+    player.setVelocity(0);
+    player.disableBody(true, true);
+
+    // on ne valide que si toutes les pièces ont été ramassées
+    if (this.niveauComplete) {
+      let niveauxFinis = this.game.registry.get('niveauxFinis');
+      if (!niveauxFinis.includes('niveau5')) {
+        niveauxFinis.push('niveau5');
+        this.game.registry.set('niveauxFinis', niveauxFinis);
+      }
+    }
+
+    // retour tp menu principal
+    if (this.musiqueNiveau5) this.musiqueNiveau5.stop();
+    this.scene.start('pageprincipale');
+  }
+
+  ramasserPiece(player, piece) {
+    piece.disableBody(true, true);
+
+    // si toutes les pièces sont ramassées → niveau complet
+    if (this.groupe_pieces.countActive() === 0) {
+      this.niveauComplete = true;
     }
   }
 }

@@ -108,7 +108,7 @@ export default class niveau7 extends Phaser.Scene {
 
 
 
-    this.player = this.physics.add.sprite(300, 300, 'astronaut');
+    this.player = this.physics.add.sprite(2950, 300, 'astronaut');
     this.player.setSize(50, 70);
     this.player.setOffset(36, 10);
     this.player.setCollideWorldBounds(true);
@@ -422,6 +422,17 @@ export default class niveau7 extends Phaser.Scene {
   }
 
   update() {
+    // touche triche : T = ramasse toutes les pièces sans valider le niveau
+    if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('T'))) {
+    this.groupe_pieces.getChildren().forEach(piece => {
+        piece.disableBody(true, true);
+    });
+    // vérifie si toutes les pièces sont ramassées
+    if (this.groupe_pieces.countActive() === 0) {
+        this.niveauComplete = true;
+    }
+}
+
     if (this.clavier.right.isDown) {
       this.player.setVelocityX(160);
       this.player.direction = 'droite'
