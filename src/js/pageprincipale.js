@@ -316,7 +316,7 @@ export default class pageprincipale extends Phaser.Scene {
 
             // Terre : seulement si toutes les pièces récupérées
             if (this.physics.overlap(player, p8) && terreDeverrouillee) {
-                this.scene.start('niveauTerre'); // à adapter selon ton nom de scène
+                this.scene.start('niveau8fin'); // à adapter selon ton nom de scène
 
             }
 

@@ -9,6 +9,7 @@ import intro from "/src/js/intro.js";
 import acceuil from "/src/js/acceuil.js";
 import niveau6 from "/src/js/niveau6.js";
 import niveau7 from "/src/js/niveau7.js";
+import niveau8fin from "/src/js/niveau8fin.js";
 
 // configuration générale du jeu
 var config = {
@@ -30,7 +31,7 @@ var config = {
       debug: true // permet de voir les hitbox et les vecteurs d'acceleration quand mis à true
     }
   },
-  scene: [acceuil, intro, pageprincipale, niveau1, niveau2, niveau3, niveau4, niveau5, niveau6, niveau7]
+  scene: [acceuil, intro, pageprincipale, niveau1, niveau2, niveau3, niveau4, niveau5, niveau6, niveau7, niveau8fin]
 };
 
 // création et lancement du jeu
@@ -41,4 +42,4 @@ game.events.once('ready', () => {
     game.soundOn = true;
 });
 
-game.scene.start("niveau7"); // démarre la scène niveau1
+game.scene.start("acceuil"); // démarre la scène d'accueil
