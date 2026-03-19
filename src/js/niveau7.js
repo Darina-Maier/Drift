@@ -512,19 +512,27 @@ export default class niveau7 extends Phaser.Scene {
     }
   }
 
-  finNiveau(player, teleporter) {
+  ramasserPiece(player, piece) {
+    piece.disableBody(true, true);
 
-    // optionnel : désactiver le joueur pour éviter multi déclenchement
+    // Incrémenter le compteur global
+    let pieces = this.game.registry.get('pieces');
+    this.game.registry.set('pieces', pieces + 1);
+}
+
+finNiveau(player, teleporter) {
     player.setVelocity(0);
     player.disableBody(true, true);
 
-    // retour tp menu principal
-    this.scene.start('pageprincipale');
-  }
+    // Marquer ce niveau comme terminé
+    let niveauxFinis = this.game.registry.get('niveauxFinis');
+    if (!niveauxFinis.includes('niveau7')) {
+        niveauxFinis.push('niveau7');
+        this.game.registry.set('niveauxFinis', niveauxFinis);
+    }
 
-  ramasserPiece(player, piece) {
-    piece.disableBody(true, true);
-    // Ici tu peux ajouter du code pour augmenter le score ou autre
-  }
+    if (this.musiqueNiveau7) this.musiqueNiveau7.stop();
+    this.scene.start('pageprincipale');
+}
 }
 

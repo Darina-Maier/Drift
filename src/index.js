@@ -35,4 +35,12 @@ var config = {
 
 // création et lancement du jeu
 var game = new Phaser.Game(config);
+
+game.events.once('ready', () => {
+    game.registry.set('pieces', 0);        // pièces collectées
+    game.registry.set('piecesTotal', 7);   // 1 pièce par niveau
+    game.registry.set('niveauxFinis', []); // niveaux terminés
+    game.soundOn = true;
+});
+
 game.scene.start("pageprincipale"); // démarre la scène pageprincipale

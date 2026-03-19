@@ -84,6 +84,37 @@ export default class pageprincipale extends Phaser.Scene {
         var p8 = this.physics.add.staticSprite(1946, 384, 'planete8');
         var plateforme = this.physics.add.staticSprite(0, 384, 'plateforme1');
 
+        // Compteur pièces (fixe à l'écran)
+        this.textePieces = this.add.text(16, 16, '', {
+            fontSize: '20px',
+            fill: '#ffffff',
+            fontFamily: 'Orbitron',
+            backgroundColor: '#000000',
+            padding: { x: 8, y: 4 }
+        }).setScrollFactor(0).setDepth(10);
+
+        // Overlay gris pour planètes terminées
+        this.overlays = {};
+        const planetes = { niveau1: p1, niveau2: p2, niveau3: p3, niveau4: p4, niveau5: p5, niveau6: p6, niveau7: p7 };
+
+        Object.entries(planetes).forEach(([nom, planete]) => {
+            let overlay = this.add.circle(planete.x, planete.y, 94, 0x000000, 0.6);
+            overlay.setDepth(5);
+            let check = this.add.text(planete.x, planete.y, '✓', {
+                fontSize: '48px',
+                fill: '#00ff00',
+                fontFamily: 'Orbitron'
+            }).setOrigin(0.5).setDepth(6);
+
+            this.overlays[nom] = { overlay, check };
+        });
+
+        // Overlay pour la Terre (p8) — bloquée par défaut
+        this.overlayTerre = this.add.circle(p8.x, p8.y, 94, 0x000000, 0.7).setDepth(5);
+        this.texteTerre = this.add.text(p8.x, p8.y, '🔒', {
+            fontSize: '36px'
+        }).setOrigin(0.5).setDepth(6);
+
         //définitions des hitbox circulaires pour planètes 
         p1.body.setCircle(94); // définit une hitbox circulaire de rayon 128 pixels centrée sur le sprite
         p1.body.setOffset(56, 56); // décale la hitbox de 64 pixels vers la gauche et 64 pixels vers le haut pour la centrer sur le sprite
@@ -121,12 +152,12 @@ export default class pageprincipale extends Phaser.Scene {
         this.add.text(1700, 520, 'Planète\nDARTIES', { fontSize: '16px', fill: '#fff', fontFamily: 'Orbitron', align: 'center' }).setOrigin(0.5);
         this.add.text(1946, 520, 'Planète\nTERRE', { fontSize: '16px', fill: '#fff', fontFamily: 'Orbitron', align: 'center' }).setOrigin(0.5);
 
-            //création joueur 
-            player = this.physics.add.sprite(0, 10, 'astronaut');
-            player.setSize(40, 65);
-            player.direction = 'droite'
+        //création joueur 
+        player = this.physics.add.sprite(0, 10, 'astronaut');
+        player.setSize(40, 65);
+        player.direction = 'droite'
 
-            //parametres joueur 
+        //parametres joueur 
         player.setCollideWorldBounds(true);
         this.physics.world.setBounds(0, 0, 2048, 768);
         this.cameras.main.setBounds(0, 0, 2048, 768);
@@ -203,26 +234,45 @@ export default class pageprincipale extends Phaser.Scene {
   /***********************************************************************/
 
     update() {
+        // Mise à jour compteur
+        const pieces = this.game.registry.get('pieces');
+        const piecesTotal = this.game.registry.get('piecesTotal');
+        const niveauxFinis = this.game.registry.get('niveauxFinis');
+        this.textePieces.setText('🔧 Pièces : ' + pieces + ' / ' + piecesTotal);
+
+        // Affiche overlays des niveaux terminés
+        const planetes = { niveau1: p1, niveau2: p2, niveau3: p3, niveau4: p4, niveau5: p5, niveau6: p6, niveau7: p7 };
+        Object.entries(planetes).forEach(([nom, planete]) => {
+            const fini = niveauxFinis.includes(nom);
+            this.overlays[nom].overlay.setVisible(fini);
+            this.overlays[nom].check.setVisible(fini);
+        });
+
+        // Terre : bloquée tant que toutes les pièces ne sont pas récupérées
+        const terreDeverrouillee = pieces >= piecesTotal;
+        this.overlayTerre.setVisible(!terreDeverrouillee);
+        this.texteTerre.setVisible(!terreDeverrouillee);
+
+        // Mouvements joueur (ton code existant)
         if (boutoncourir.isDown) {
             if (player.direction == 'droite') {
-                player.setVelocityX(300); // plus rapide en courant
+                player.setVelocityX(300);
                 player.anims.play('courirdroite', true);
-            }
-            else {
-                player.setVelocityX(-300); // plus rapide en courant
-                player.anims.play('courirgauche', true); //gauche plus tard
+            } else {
+                player.setVelocityX(-300);
+                player.anims.play('courirgauche', true);
             }
         } else {
             if (clavier.right.isDown) {
                 player.setVelocityX(160);
-                player.direction = 'droite'
+                player.direction = 'droite';
                 player.anims.play('anim_droite', true);
             } else if (clavier.left.isDown) {
                 player.setVelocityX(-160);
-                player.direction = 'gauche'
+                player.direction = 'gauche';
                 player.anims.play('anim_gauche', true);
             } else {
-                player.setVelocityX(0); // ← action séparée
+                player.setVelocityX(0);
                 if (player.direction == 'droite') {
                     player.anims.play('immobiledroit', true);
                 } else {
@@ -235,28 +285,30 @@ export default class pageprincipale extends Phaser.Scene {
             player.setVelocityY(-300);
         }
 
-        // permet de entrer dans chaque niveau avec touche E 
+        // Entrée dans les niveaux avec touche E
         if (Phaser.Input.Keyboard.JustDown(boutonentrer)) {
-            if (this.physics.overlap(player, p1)) {
-                this.scene.start('niveau1');
-            }
-            if (this.physics.overlap(player, p2)) {
-                this.scene.start('niveau2');
-            }
-            if (this.physics.overlap(player, p3)) {
-                this.scene.start('niveau3');
-            }
-            if (this.physics.overlap(player, p4)) {
-                this.scene.start('niveau4');
-            }
-            if (this.physics.overlap(player, p5)) {
-                this.scene.start('niveau5');
-            }
-            if (this.physics.overlap(player, p6)) {
-                 this.scene.start('niveau6');
-            }
-            if (this.physics.overlap(player, p7)) {
-                this.scene.start('niveau7');
+            const entrees = [
+                { planete: p1, niveau: 'niveau1' },
+                { planete: p2, niveau: 'niveau2' },
+                { planete: p3, niveau: 'niveau3' },
+                { planete: p4, niveau: 'niveau4' },
+                { planete: p5, niveau: 'niveau5' },
+                { planete: p6, niveau: 'niveau6' },
+                { planete: p7, niveau: 'niveau7' },
+            ];
+
+            entrees.forEach(({ planete, niveau }) => {
+                if (this.physics.overlap(player, planete)) {
+                    // Bloque si niveau déjà terminé
+                    if (!niveauxFinis.includes(niveau)) {
+                        this.scene.start(niveau);
+                    }
+                }
+            });
+
+            // Terre : seulement si toutes les pièces récupérées
+            if (this.physics.overlap(player, p8) && terreDeverrouillee) {
+                this.scene.start('niveauTerre'); // à adapter selon ton nom de scène
             }
         }
     }
