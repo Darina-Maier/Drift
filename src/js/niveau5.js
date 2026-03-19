@@ -23,6 +23,8 @@ export default class niveau5 extends Phaser.Scene {
     this.load.audio("musiqueNiveau5", "src/assets/sons/niveau5.ogg");
     this.load.image("bg5", "src/assets/tuilesn5/background_n5.png");
     this.load.image("t5", "src/assets/tuilesn5/Tileset_n5.png");
+    //chargement piece5
+    this.load.image('piece5', 'src/assets/tuilesn5/piece5.png');
 
     // chargement de la carte
     this.load.tilemapTiledJSON("carte5", "src/assets/map_n5.json");
@@ -203,6 +205,24 @@ this.teleporter.setScale(0.3);
 this.teleporter.setSize(50,200);
 this.physics.add.overlap(this.player, this.teleporter, this.finNiveau, null, this);
 
+// création pièces
+    this.groupe_pieces = this.physics.add.staticGroup();
+    // Récupère le calque objet
+    const calque_objets = carten5.getObjectLayer('calque_objet5');
+
+    if (!calque_objets) {
+    console.error("Calque pièces introuvable !");
+} else {
+    calque_objets.objects.forEach(point => {
+        if (point.name == 'piecearamasser5') {
+            var nouvelle_piece = this.groupe_pieces.create(point.x, point.y, 'piece5');
+            nouvelle_piece.setScale(0.5);
+        }
+    });
+}
+
+    // PERMET DE RAMASSER LES PIECES
+    this.physics.add.overlap(this.player, this.groupe_pieces, this.ramasserPiece, null, this);
 
   }
 
@@ -354,6 +374,11 @@ finNiveau(player, teleporter) {
   // retour tp menu principal
   this.scene.start('pageprincipale');
 }
+
+ramasserPiece(player, piece) {
+    piece.disableBody(true, true);
+    // Ici tu peux ajouter du code pour augmenter le score ou autre
+  }
 
 }
 
