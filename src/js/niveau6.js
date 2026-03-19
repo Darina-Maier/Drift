@@ -107,13 +107,6 @@ export default class niveau6 extends Phaser.Scene {
     });
     this.texteVies.setScrollFactor(0);
 
-    // texte score
-    this.texteScore = this.add.text(20, 50, "Pièces : 0", {
-      fontSize: "24px",
-      fill: "#ffff00"
-    });
-    this.texteScore.setScrollFactor(0);
-
     /***********************************************************************/
     /** PIECES
     /***********************************************************************/
@@ -267,15 +260,25 @@ export default class niveau6 extends Phaser.Scene {
   ramasserPiece(player, piece) {
     piece.destroy();
     this.score++;
-    this.texteScore.setText("Pièces : " + this.score);
   }
 
   finNiveau(player, teleporter) {
-    // Arrête la musique et redémarre la scène principale
-    if (this.musiqueNiveau6) {
-      this.musiqueNiveau6.stop();
-    }
-    this.scene.start('pageprincipale');
+    // Empêcher les appels multiples
+    if (this.finNiveauAppele) return;
+    this.finNiveauAppele = true;
+
+    // Fondu progressif (fade out)
+    this.cameras.main.fadeOut(1500, 0, 0, 0);
+
+    // Attendre la fin du fondu puis changer de niveau
+    this.time.delayedCall(1500, () => {
+      // Arrête la musique
+      if (this.musiqueNiveau6) {
+        this.musiqueNiveau6.stop();
+      }
+      // Change de scène
+      this.scene.start('pageprincipale');
+    });
   }
 
   toucherPoisson(player, poisson) {

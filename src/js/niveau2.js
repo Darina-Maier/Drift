@@ -3,8 +3,6 @@
 /***********************************************************************/
 var player;
 var clavier;
-var timerText;
-var timeRemaining;
 var boutoncourir;
 var calque_plateforme1;
 var calque_plateforme2;
@@ -184,20 +182,6 @@ export default class niveau2 extends Phaser.Scene {
     this.cameras.main.startFollow(this.player);
     this.physics.world.setBounds(0, 0, 3072, 768);
 
-
-    // Timer de 90 secondes
-    timeRemaining = 90;
-    timerText = this.add.text(20, 20, "Temps: 1:30", {
-      fontSize: "32px", fill: "#ffffff", fontStyle: "bold"
-    });
-    timerText.setScrollFactor(0);
-
-    this.time.addEvent({
-      delay: 1000,
-      callback: this.updateTimer,
-      callbackScope: this,
-      loop: true
-    });
     this.physics.world.gravity.y = 500;
 
     // animation du téléporteur avec les 9 images
@@ -319,36 +303,28 @@ this.physics.add.overlap(this.player, this.teleporter, this.finNiveau, null, thi
     });
   }
 
-  updateTimer() {
-    timeRemaining--;
-    const minutes = Math.floor(timeRemaining / 60);
-    const seconds = timeRemaining % 60;
-    const displaySeconds = seconds < 10 ? '0' + seconds : seconds;
-    timerText.setText('Temps: ' + minutes + ':' + displaySeconds);
-
-    // Rouge quand il reste 15 secondes
-    if (timeRemaining <= 15) {
-      timerText.setFill('#ff0000');
-    }
-
-    // Timer écoulé → reset position + repart de 90 secondes
-    if (timeRemaining <= 0) {
-      this.player.setPosition(100, 450);
-      this.player.setVelocity(0, 0);
-      timeRemaining = 90;
-      timerText.setFill('#ffffff');
-    }
-  }
-
   finNiveau(player, teleporter) {
+    // Empêcher les appels multiples
+    if (this.finNiveauAppele) return;
+    this.finNiveauAppele = true;
 
-  // optionnel : désactiver le joueur pour éviter multi déclenchement
-  player.setVelocity(0);
-  player.disableBody(true, true);
+    // optionnel : désactiver le joueur pour éviter multi déclenchement
+    player.setVelocity(0);
+    player.disableBody(true, true);
 
-  // retour tp menu principal
-  this.scene.start('pageprincipale');
-}
+    // Arrêter la musique du niveau 2
+    if (this.musiqueNiveau2) {
+      this.musiqueNiveau2.stop();
+    }
+
+    // Fondu progressif (fade out)
+    this.cameras.main.fadeOut(1500, 0, 0, 0);
+
+    // Attendre la fin du fondu puis changer de niveau
+    this.time.delayedCall(1500, () => {
+      this.scene.start('pageprincipale');
+    });
+  }
 
 }
 

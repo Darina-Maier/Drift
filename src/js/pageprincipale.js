@@ -149,6 +149,16 @@ export default class pageprincipale extends Phaser.Scene {
         boutonentrer = this.input.keyboard.addKey('E');
         boutoncourir = this.input.keyboard.addKey('C');
 
+        // Créer le sticker "E" invisible au départ (même style que niveau7)
+        this.stickeurE = this.add.text(0, 0, 'E', {
+            fontSize: '24px',
+            fill: '#ffffff',
+            backgroundColor: '#000000'
+        });
+        this.stickeurE.setOrigin(0.5);
+        this.stickeurE.setVisible(false);
+        this.stickeurE.setDepth(10); // pour qu'il soit au-dessus des autres objets
+
         //animations
         this.anims.create({
             key: 'anim_droite',
@@ -203,6 +213,29 @@ export default class pageprincipale extends Phaser.Scene {
   /***********************************************************************/
 
     update() {
+        // Vérifier la collision avec les planètes et afficher le sticker E
+        const planetes = [p1, p2, p3, p4, p5, p6, p7, p8];
+        let surPlanete = false;
+        let planetePosX = 0;
+
+        for (let planete of planetes) {
+            if (this.physics.overlap(player, planete)) {
+                surPlanete = true;
+                planetePosX = planete.x;
+                break;
+            }
+        }
+
+        if (surPlanete) {
+            this.stickeurE.setVisible(true);
+            // Coordonnées du sticker E : modifie ces valeurs pour changer la position
+            const offsetX = 30;   // Décalage horizontal (0 = centré sur la planète)
+            const offsetY = -150; // Décalage vertical (-100 = 100 pixels au-dessus)
+            this.stickeurE.setPosition(planetePosX + offsetX, 384 + offsetY);
+        } else {
+            this.stickeurE.setVisible(false);
+        }
+
         if (boutoncourir.isDown) {
             if (player.direction == 'droite') {
                 player.setVelocityX(300); // plus rapide en courant

@@ -204,13 +204,26 @@ update() {
 }
 
 finNiveau(player, teleporter) {
+  // Empêcher les appels multiples
+  if (this.finNiveauAppele) return;
+  this.finNiveauAppele = true;
 
   // optionnel : désactiver le joueur pour éviter multi déclenchement
   player.setVelocity(0);
   player.disableBody(true, true);
 
-  // retour tp menu principal
-  this.scene.start('pageprincipale');
+  // Arrêter la musique du niveau 1
+  if (this.musiqueNiveau1) {
+    this.musiqueNiveau1.stop();
+  }
+
+  // Fondu progressif (fade out)
+  this.cameras.main.fadeOut(1500, 0, 0, 0);
+
+  // Attendre la fin du fondu puis changer de niveau
+  this.time.delayedCall(1500, () => {
+    this.scene.start('pageprincipale');
+  });
 }
   ramasserPiece(player, piece) {
     piece.disableBody(true, true);
