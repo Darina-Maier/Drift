@@ -109,23 +109,24 @@ export default class pageprincipale extends Phaser.Scene {
         p8.body.setCircle(94); // définit une hitbox circulaire de rayon 128 pixels centrée sur le sprite
         p8.body.setOffset(56, 56);
 
+        document.fonts.load('16px Orbitron').then(() => {
+        });
         // ajout des noms des planètes 
-        this.add.text(185, 500, 'MAKHCHAN', { fontSize: '16px', fill: '#fff' });
-        this.add.text(441, 500, 'FRAGALE', { fontSize: '16px', fill: '#fff' });
-        this.add.text(687, 500, 'DURAND', { fontSize: '16px', fill: '#fff' });
-        this.add.text(933, 500, 'JOUSSET', { fontSize: '16px', fill: '#fff' });
-        this.add.text(1182, 500, 'MEYER', { fontSize: '16px', fill: '#fff' });
-        this.add.text(1430, 500, 'ALONZO', { fontSize: '16px', fill: '#fff' });
-        this.add.text(1671, 500, 'DARTIES', { fontSize: '16px', fill: '#fff' });
-        this.add.text(1920, 500, 'TERRE', { fontSize: '16px', fill: '#fff' });
+        this.add.text(224, 500, 'Planète\nMAKHCHAN', { fontSize: '16px', fill: '#fff', fontFamily: 'Orbitron', align: 'center' }).setOrigin(0.5);
+        this.add.text(470, 500, 'Planète\nFRAGALE', { fontSize: '16px', fill: '#fff', fontFamily: 'Orbitron', align: 'center' }).setOrigin(0.5);
+        this.add.text(716, 500, 'Planète\nDURAND', { fontSize: '16px', fill: '#fff', fontFamily: 'Orbitron', align: 'center' }).setOrigin(0.5);
+        this.add.text(962, 500, 'Planète\nJOUSSET', { fontSize: '16px', fill: '#fff', fontFamily: 'Orbitron', align: 'center' }).setOrigin(0.5);
+        this.add.text(1208, 500, 'Planète\nMEYER', { fontSize: '16px', fill: '#fff', fontFamily: 'Orbitron', align: 'center' }).setOrigin(0.5);
+        this.add.text(1454, 500, 'Planète\nALONZO', { fontSize: '16px', fill: '#fff', fontFamily: 'Orbitron', align: 'center' }).setOrigin(0.5);
+        this.add.text(1700, 500, 'Planète\nDARTIES', { fontSize: '16px', fill: '#fff', fontFamily: 'Orbitron', align: 'center' }).setOrigin(0.5);
+        this.add.text(1946, 500, 'Planète\nTERRE', { fontSize: '16px', fill: '#fff', fontFamily: 'Orbitron', align: 'center' }).setOrigin(0.5);
 
+            //création joueur 
+            player = this.physics.add.sprite(0, 10, 'astronaut');
+            player.setSize(65, 45);
+            player.direction = 'droite'
 
-        //création joueur 
-        player = this.physics.add.sprite(0, 10, 'astronaut');
-        player.setSize(65, 45);
-        player.direction = 'droite'
-
-        //parametres joueur 
+            //parametres joueur 
         player.setCollideWorldBounds(true);
         this.physics.world.setBounds(0, 0, 2048, 768);
         this.cameras.main.setBounds(0, 0, 2048, 768);
